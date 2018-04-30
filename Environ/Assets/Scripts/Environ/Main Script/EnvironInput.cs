@@ -11,8 +11,18 @@
 
         public void AddToInputs(EnvironOutput output)
         {
-            if (!inputList.Contains(output))
-                inputList.Add(output);
+            EnvironOutput match = null;
+            foreach(EnvironOutput eo in inputList)
+            {
+                if (eo == output)
+                    match = eo;
+            }
+
+            if (match == null)
+                inputList.Add(Instantiate(output));
+
+            else
+                match.RefreshLimit();
         }
     }
 }

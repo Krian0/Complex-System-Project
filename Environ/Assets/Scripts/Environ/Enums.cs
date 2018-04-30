@@ -5,7 +5,9 @@ namespace EnvironEnum
     {
         public enum DamageCondition
         {
-            ON_CONTACT = 0,
+            ON_COLLISION_ENTER = 0,
+            ON_COLLISION_EXIT,
+            ON_COLLISION_STAY,
             ON_TRIGGER_ENTER,
             ON_TRIGGER_EXIT,
             ON_TRIGGER_STAY
@@ -14,7 +16,6 @@ namespace EnvironEnum
         public enum DamageRegularity
         {
             UNTIL_DESTROYED = 0,
-            ONCE,
             TIME_LIMIT,
             ATTACK_LIMIT,
             DAMAGE_LIMIT
@@ -48,7 +49,8 @@ namespace EnvironEnum
     {
         public enum DestructOrSpawnCondition
         {
-            ON_CONTACT = 0,
+            ON_COLLISION_ENTER = 0,
+            ON_COLLISION_EXIT,
             ON_TRIGGER_ENTER,
             ON_TRIGGER_EXIT,
             TIMER_ZERO,
