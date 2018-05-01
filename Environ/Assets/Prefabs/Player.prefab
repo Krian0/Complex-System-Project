@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 143291345239998098}
   - component: {fileID: 23531718604579960}
   - component: {fileID: 114905669127523776}
+  - component: {fileID: 114980508928002426}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -89,8 +90,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1123629702128634}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1.05, y: 1, z: 1.677}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4917062949245034}
@@ -345,6 +346,22 @@ MonoBehaviour:
   run: 0
   jump: 0
   canMove: 0
+--- !u!114 &114980508928002426
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1123629702128634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89134264c2018744aa458c300e822a35, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitPointLimit: 200
+  hitPoints: 0
+  resistances: {fileID: 0}
+  output: {fileID: 0}
+  effects: {fileID: 11400000, guid: 094acf7b4242f1f419be2f4255a79ea2, type: 2}
 --- !u!124 &124679215168378302
 Behaviour:
   m_ObjectHideFlags: 1
@@ -366,6 +383,6 @@ CharacterController:
   m_Radius: 0.5
   m_SlopeLimit: 45
   m_StepOffset: 0.3
-  m_SkinWidth: 0.08
+  m_SkinWidth: 0.05
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0.45, z: 0}
+  m_Center: {x: 0, y: 0.47, z: 0}
