@@ -14,31 +14,31 @@ OcclusionCullingSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 8
-  m_Fog: 0
-  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  m_FogMode: 3
-  m_FogDensity: 0.01
-  m_LinearFogStart: 0
-  m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
-  m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
-  m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
+  m_Fog: 1
+  m_FogColor: {r: 0.40392157, g: 0.45490196, b: 0.2901961, a: 0.6392157}
+  m_FogMode: 1
+  m_FogDensity: 0.008
+  m_LinearFogStart: 6
+  m_LinearFogEnd: 100
+  m_AmbientSkyColor: {r: 0.86764705, g: 0.8531276, b: 0.65711504, a: 1}
+  m_AmbientEquatorColor: {r: 0.008874229, g: 0.25735295, b: 0, a: 1}
+  m_AmbientGroundColor: {r: 0.50735295, g: 0.70983773, b: 0.75, a: 1}
   m_AmbientIntensity: 1
-  m_AmbientMode: 0
+  m_AmbientMode: 3
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 2100000, guid: d9dca9ae1786c394f9e79c637aa9a7bf, type: 2}
-  m_HaloStrength: 0.5
+  m_HaloStrength: 0.524
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
   m_HaloTexture: {fileID: 0}
   m_SpotCookie: {fileID: 10001, guid: 0000000000000000e000000000000000, type: 0}
   m_DefaultReflectionMode: 0
   m_DefaultReflectionResolution: 128
-  m_ReflectionBounces: 1
-  m_ReflectionIntensity: 1
+  m_ReflectionBounces: 2
+  m_ReflectionIntensity: 0.819
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.3874218, g: 0.4306142, b: 0.49862617, a: 1}
+  m_IndirectSpecularColor: {r: 0.5514663, g: 0.64189965, b: 0.6933836, a: 0.819}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -146,6 +146,7 @@ MonoBehaviour:
   hitPointLimit: 50
   hitPoints: 2
   resistances: {fileID: 11400000, guid: e9eea76d4f890d94ba9cf6aec6914379, type: 2}
+  appearance: {fileID: 0}
   output: {fileID: 0}
   effects: {fileID: 11400000, guid: 28cbbd8a509297747a01e2b578412f79, type: 2}
 --- !u!23 &29341682
@@ -216,6 +217,56 @@ Transform:
   m_Father: {fileID: 2097254768}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &56205987
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1494795817}
+    m_Modifications:
+    - target: {fileID: 4057880796647848, guid: ce44be986bd8d494c818ec18af599669, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4057880796647848, guid: ce44be986bd8d494c818ec18af599669, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4057880796647848, guid: ce44be986bd8d494c818ec18af599669, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4057880796647848, guid: ce44be986bd8d494c818ec18af599669, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 4057880796647848, guid: ce44be986bd8d494c818ec18af599669, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4057880796647848, guid: ce44be986bd8d494c818ec18af599669, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4057880796647848, guid: ce44be986bd8d494c818ec18af599669, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 4057880796647848, guid: ce44be986bd8d494c818ec18af599669, type: 2}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4057880796647848, guid: ce44be986bd8d494c818ec18af599669, type: 2}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4057880796647848, guid: ce44be986bd8d494c818ec18af599669, type: 2}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: ce44be986bd8d494c818ec18af599669, type: 2}
+  m_IsPrefabParent: 0
 --- !u!1 &382714093
 GameObject:
   m_ObjectHideFlags: 0
@@ -242,7 +293,7 @@ Light:
   serializedVersion: 8
   m_Type: 1
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
-  m_Intensity: 1
+  m_Intensity: 0.84
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10
@@ -274,13 +325,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 382714093}
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalRotation: {x: -0.7879974, y: 0.2233401, z: -0.16670191, w: -0.5489897}
   m_LocalPosition: {x: 201.9, y: 83, z: 226.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 69.996, y: -182.93199, z: 209.59499}
 --- !u!1 &398160206
 GameObject:
   m_ObjectHideFlags: 0
@@ -386,6 +437,7 @@ MonoBehaviour:
   hitPointLimit: 110
   hitPoints: 0
   resistances: {fileID: 0}
+  appearance: {fileID: 0}
   output: {fileID: 0}
   effects: {fileID: 11400000, guid: 023a477b5fcb56e4a9db29f850aa77aa, type: 2}
 --- !u!23 &488636794
@@ -402,7 +454,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 235752dbef193384f965c4e8652c0db8, type: 2}
+  - {fileID: 2100000, guid: 54225717f60590a48b0eb55cd9aa8a38, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -536,6 +588,7 @@ MonoBehaviour:
   hitPointLimit: 100
   hitPoints: 0
   resistances: {fileID: 11400000, guid: 058324381476aa34eae0789b887c8ce5, type: 2}
+  appearance: {fileID: 0}
   output: {fileID: 11400000, guid: e88ebb7e7c0c36f45a940f95b294fcb6, type: 2}
   effects: {fileID: 11400000, guid: 6200d8e374f954c469da541e1ef36c52, type: 2}
 --- !u!23 &888675486
@@ -653,6 +706,7 @@ MonoBehaviour:
   hitPointLimit: 9999
   hitPoints: 0
   resistances: {fileID: 11400000, guid: 9566d6ce8bc736d48901d60c02f1b49b, type: 2}
+  appearance: {fileID: 0}
   output: {fileID: 0}
   effects: {fileID: 11400000, guid: 76e0daa62e14add488c6d77f3ef5ef4d, type: 2}
 --- !u!23 &1388555939
@@ -708,6 +762,11 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1388555935}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &1389966682 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 4057880796647848, guid: ce44be986bd8d494c818ec18af599669,
+    type: 2}
+  m_PrefabInternal: {fileID: 56205987}
 --- !u!1 &1486099535
 GameObject:
   m_ObjectHideFlags: 0
@@ -770,6 +829,7 @@ MonoBehaviour:
   hitPointLimit: 100
   hitPoints: 0
   resistances: {fileID: 11400000, guid: 058324381476aa34eae0789b887c8ce5, type: 2}
+  appearance: {fileID: 0}
   output: {fileID: 0}
   effects: {fileID: 11400000, guid: 6200d8e374f954c469da541e1ef36c52, type: 2}
 --- !u!23 &1486099539
@@ -859,6 +919,7 @@ MonoBehaviour:
   hitPointLimit: 50
   hitPoints: 0
   resistances: {fileID: 0}
+  appearance: {fileID: 0}
   output: {fileID: 11400000, guid: 1141ce103ad86ea4ca5d3a6fe6747197, type: 2}
   effects: {fileID: 0}
 --- !u!23 &1494795814
@@ -923,7 +984,8 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 6.46, y: 0.5, z: 10.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 1389966682}
   m_Father: {fileID: 2097254768}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1222,7 +1284,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 042d54d19765b614daa364c3b8e304a9, type: 2}
+  - {fileID: 2100000, guid: 2a8234130e7aeb8488b60a145af9e858, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1288,5 +1350,6 @@ MonoBehaviour:
   hitPointLimit: 200
   hitPoints: 0
   resistances: {fileID: 11400000, guid: 22ed5dbbea970a14aa470156df8939ab, type: 2}
+  appearance: {fileID: 0}
   output: {fileID: 0}
   effects: {fileID: 11400000, guid: d88cb03d3254a384dbaf31bc45d5d247, type: 2}

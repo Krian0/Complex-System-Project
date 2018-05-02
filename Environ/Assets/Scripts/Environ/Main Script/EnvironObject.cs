@@ -10,7 +10,7 @@
         public float hitPointLimit;
         public float hitPoints;
         public ResistanceInfo resistances;
-        //public AppearanceInfo appearance;
+        public AppearanceInfo appearance;
         //public List<DestructionInfo> destroyConditions;
 
         public EnvironOutput output;
