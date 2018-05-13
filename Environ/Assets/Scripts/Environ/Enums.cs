@@ -1,9 +1,9 @@
 ﻿
 namespace EnvironEnum
 {
-    namespace DamageEnum
+    namespace GeneralEnum
     {
-        public enum DamageCondition
+        public enum TransferCondition
         {
             ON_COLLISION_ENTER = 0,
             ON_COLLISION_EXIT,
@@ -13,15 +13,25 @@ namespace EnvironEnum
             ON_TRIGGER_STAY
         }
 
-        public enum DamageRegularity
+        //public enum TerminalCondition
+        //{
+        //    ON_COLLISION_EXIT = 0,
+        //    ON_TRIGGER_EXIT,
+        //    ON_TIMER,
+        //    NONE
+        //}
+    }
+
+    namespace DamageEnum
+    {
+        public enum DamageLimit
         {
-            UNTIL_DESTROYED = 0,
+            NO_LIMIT = 0,
             TIME_LIMIT,
             ATTACK_LIMIT,
             DAMAGE_LIMIT
         }
 
-        //Do not change, move or remove NULL
         public enum DamageType
         {
             NULL = 0,
@@ -43,6 +53,11 @@ namespace EnvironEnum
             MULTIPLY_DAMAGE,
             HEAL
         }
+    }
+
+    namespace AppearanceEnum
+    {
+
     }
 
     namespace DestructAndSpawnEnum

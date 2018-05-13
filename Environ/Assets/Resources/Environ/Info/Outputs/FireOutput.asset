@@ -11,7 +11,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2d3499eba882764bb49d7b358b44895, type: 3}
   m_Name: FireOutput
   m_EditorClassIdentifier: 
+  transferOnCondition: 2
+  allowTransmission: 0
   damageOut: {fileID: 11400000, guid: 0ad09ecb5e41ea9478d59d1cfb77da06, type: 2}
-  destroyConditionOut: {fileID: 0}
   appearanceOut: {fileID: 0}
   source: {fileID: 0}

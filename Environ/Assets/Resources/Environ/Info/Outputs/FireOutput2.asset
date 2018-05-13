@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2d3499eba882764bb49d7b358b44895, type: 3}
+  m_Name: FireOutput2
+  m_EditorClassIdentifier: 
+  transferOnCondition: 0
+  allowTransmission: 0
+  damageOut: {fileID: 0}
+  appearanceOut: {fileID: 11400000, guid: f7438cdbf5a69cc4abe1b8aab9a7713e, type: 2}
+  source: {fileID: 0}

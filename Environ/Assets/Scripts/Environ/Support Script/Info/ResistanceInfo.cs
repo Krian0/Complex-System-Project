@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using EnvironContainers;
     using EnvironEnum.DamageEnum;
-    using System;
     using EnvironEnum.ResistanceEnum;
 
     [CreateAssetMenu(fileName = "NewResistanceInfo.asset", menuName = "Environ/Info/New ResistanceInfo", order = 1)]

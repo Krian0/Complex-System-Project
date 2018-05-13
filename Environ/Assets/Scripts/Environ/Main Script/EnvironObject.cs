@@ -1,9 +1,10 @@
 ﻿namespace Environ
 {
     using UnityEngine;
+    using EnvironEnum.GeneralEnum;
     using EnvironEnum.DamageEnum;
     using EnvironInfo;
-    using EnvironContainers;
+    using System.Collections.Generic;
 
     public class EnvironObject : MonoBehaviour
     {
@@ -13,17 +14,17 @@
         public AppearanceInfo appearance;
         //public List<DestructionInfo> destroyConditions;
 
-        public EnvironOutput output;
-        public EnvironInput effects;
+        public List<EnvironOutput> output;
+        public EnvironEffectList effects;
 
 
         void Start()
         {
-            if (output != null)
-                output.source = this;
+            if (output.Count > 0)
+                foreach (EnvironOutput eo in output)
+                    eo.source = this;
 
-            if (effects != null)
-                effects = Instantiate(effects);
+            effects = new EnvironEffectList();
 
             if (hitPoints == 0)
                 hitPoints = hitPointLimit;
@@ -33,18 +34,14 @@
         {
             if (effects == null) return;
 
-            foreach (EnvironOutput effect in effects.inputList)
+            foreach (EnvironOutput e in effects.inputList)
             {
-                DamageInfo damageOut = effect.damageOut;
+                if (e.damageOut != null)
+                    if (e.damageOut.CanAttack())                       //Passes adjusted damage through UpdateLimit
+                        hitPoints -= e.damageOut.UpdateLimit(GetAdjustedDamage(e.damageOut.damage, e.damageOut.ID));
 
-                damageOut.UpdateLimits();
-                if (damageOut.CanAttack())
-                {
-                    float damageValue = GetAdjustedDamage(damageOut.damage, damageOut.ID);
-                    hitPoints -= damageValue;
-                    if (damageOut.regularity == DamageRegularity.DAMAGE_LIMIT)
-                        damageOut.limitTracker -= damageValue;
-                }
+                if (e.appearanceOut != null)
+                    e.appearanceOut.UpdateAppearance(); 
             }
 
             if (hitPoints < 0)
@@ -63,113 +60,50 @@
 
         private void OnTriggerEnter(Collider other)
         {
-            OnEnter(DamageCondition.ON_TRIGGER_ENTER, DamageCondition.ON_TRIGGER_STAY, other.gameObject);
+            OnEnter(TransferCondition.ON_TRIGGER_ENTER, TransferCondition.ON_TRIGGER_STAY, other.gameObject);
         }
 
         private void OnTriggerExit(Collider other)
         {
-            OnExit(DamageCondition.ON_TRIGGER_EXIT, DamageCondition.ON_TRIGGER_STAY, other.gameObject);
+            OnExit(TransferCondition.ON_TRIGGER_EXIT, TransferCondition.ON_TRIGGER_STAY, other.gameObject);
         }
 
         private void OnCollisionEnter(Collision collision)
         {
-            OnEnter(DamageCondition.ON_COLLISION_ENTER, DamageCondition.ON_COLLISION_STAY, collision.gameObject);
+            OnEnter(TransferCondition.ON_COLLISION_ENTER, TransferCondition.ON_COLLISION_STAY, collision.gameObject);
         }
 
         private void OnCollisionExit(Collision collision)
         {
-            OnExit(DamageCondition.ON_COLLISION_EXIT, DamageCondition.ON_COLLISION_STAY, collision.gameObject);
+            OnExit(TransferCondition.ON_COLLISION_EXIT, TransferCondition.ON_COLLISION_STAY, collision.gameObject);
         }
 
-        private void OnEnter(DamageCondition enter, DamageCondition stay, GameObject obj)
+        private void OnEnter(TransferCondition enter, TransferCondition stay, GameObject obj)
         {
             EnvironObject otherEO = obj.GetComponent<EnvironObject>();
-            if (otherEO == null || output == null || output.damageOut == null || otherEO.effects == null)
+            if (otherEO == null || output.Count == 0 || otherEO.effects == null)
                 return;
 
-            if (output.damageOut.transferOnCondition == enter || output.damageOut.transferOnCondition == stay)
-                otherEO.effects.Add(output);
+            foreach (EnvironOutput eo in output)
+                if (eo.transferOnCondition == enter || eo.transferOnCondition == stay)
+                    otherEO.effects.Add(eo, obj.transform);
         }
+    
 
-        private void OnExit(DamageCondition exit, DamageCondition stay, GameObject obj)
+    private void OnExit(TransferCondition exit, TransferCondition stay, GameObject obj)
         {
             EnvironObject otherEO = obj.GetComponent<EnvironObject>();
-            if (otherEO == null || output == null || output.damageOut == null || otherEO.effects == null)
+            if (otherEO == null || output.Count == 0 || otherEO.effects == null)
                 return;
 
-            if (output.damageOut.transferOnCondition == exit)
-                otherEO.effects.Add(output);
+            foreach (EnvironOutput eo in output)
+            {
+                if (eo.transferOnCondition == exit)
+                    otherEO.effects.Add(eo, obj.transform);
 
-            else if (output.damageOut.transferOnCondition == stay)
-                otherEO.effects.Remove(output);
+                else if (eo.transferOnCondition == stay)
+                    otherEO.effects.Remove(eo);
+            }
         }
-
-
-        //void Update()
-        //{
-        //    if (input.inputList.Count == 0) return;
-
-
-        //    for (int i = 0; i < input.inputList.Count; i++)
-        //    {
-        //        input.inputList[i].damageOut.UpdateTimers();
-        //        if (input.inputList[i].damageOut.CanAttack())
-        //            ApplyDamage(input.inputList[i].damageOut);
-
-        //        //        ApplyDamage(input.inputList[i].damageOut);
-        //        //ApplyAppearance(input.inputList[i].appearanceOut);
-        //        //HandleDestructionInfo(input.inputList[i].destroyConditionOut);
-        //    }
-        //}
-
-
-        //private void ApplyDamage(DamageInfo DI)
-        //{
-        //    if (DI.IsValidDamageType())
-        //        hitPoints -= GetResistanceAdjustedDamage(DI.damage, DI.ID);
-        //}
-
-        //private void ApplyAppearance(AppearanceInfo AI)
-        //{
-
-        //}
-
-        //private void HandleDestructionInfo(DestructionInfo DSI)
-        //{
-
-        //}
-
-
-        //private void OnCollisionStay(Collision collision)
-        //{
-        //    EnvironObject EO = collision.transform.gameObject.GetComponent<EnvironObject>();
-
-        //    if (EO != null)
-        //        EO.input.AddToInputs(output);
-        //}
-
-        //private void OnTriggerEnter(Collider other)
-        //{
-        //    EnvironObject EO = other.transform.gameObject.GetComponent<EnvironObject>();
-
-        //    if (EO != null)
-        //        EO.input.AddToInputs(output);
-        //}
-
-        //private void OnTriggerExit(Collider other)
-        //{
-        //    EnvironObject EO = other.transform.gameObject.GetComponent<EnvironObject>();
-
-        //    if (EO != null)
-        //        EO.input.AddToInputs(output);
-        //}
-
-        //private void OnTriggerStay(Collider other)
-        //{
-        //    EnvironObject EO = other.transform.gameObject.GetComponent<EnvironObject>();
-
-        //    if (EO != null)
-        //        EO.input.AddToInputs(output);
-        //}
     }
 }

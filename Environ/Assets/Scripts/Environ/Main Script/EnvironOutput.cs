@@ -2,13 +2,18 @@
 {
     using UnityEngine;
     using EnvironInfo;
+    using EnvironEnum.GeneralEnum;
 
     [CreateAssetMenu(fileName = "NewOutput.asset", menuName = "Environ/New Output", order = 1)]
     public class EnvironOutput : ScriptableObject
     {
+        [Tooltip("Determines when to transfer the damage effect to another object")] public TransferCondition transferOnCondition;
+        [Tooltip("Determines if the EnvironOutput effect is allowed to spread from a non-original source")] public bool allowTransmission = false;
+
+
         public DamageInfo damageOut;
-        public DestructionInfo destroyConditionOut;
         public AppearanceInfo appearanceOut;
+        //public DestructionInfo destroyConditionOut;
 
         public EnvironObject source;
 
@@ -20,13 +25,12 @@
             if (ReferenceEquals(a, null) || ReferenceEquals(b, null))
                 return false;
 
-            if (ReferenceEquals(a.damageOut, null) && ReferenceEquals(b.damageOut, null))
-                return (a.source == b.source);
+            //What the **** is happening to the enums? Why can't I compare them as Enums? What changed to make them decide they can't do it any more?
 
-            if (a.damageOut == null || b.damageOut == null)
-                return false;
+            if (a.damageOut == b.damageOut /*&& a.appearanceOut == b.appearanceOut*/)
+                return (a.source == b.source) && ((int)a.transferOnCondition == (int)b.transferOnCondition);
 
-            return (a.damageOut.ID == b.damageOut.ID) && (a.damageOut.damage == b.damageOut.damage) && (a.damageOut.transferOnCondition == b.damageOut.transferOnCondition) && (a.source == b.source);
+            return false;
         }
 
         public static bool operator !=(EnvironOutput a, EnvironOutput b)
@@ -42,16 +46,6 @@
             EnvironOutput eo = (EnvironOutput)o;
 
             return this == eo;
-
-            //if (eo == null)
-            //    return false;
-            //else
-            //{
-            //    if ((this.damageOut == null && eo.damageOut == null) && (this.source == eo.source) && (this.name == eo.name))
-            //        return true;
-
-            //    return (this.damageOut.ID == eo.damageOut.ID) && (this.source == eo.source) && (this.name == eo.name);
-            //}
         }
 
         public override int GetHashCode()
