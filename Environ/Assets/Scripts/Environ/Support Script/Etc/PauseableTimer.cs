@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Environ
 {
@@ -6,6 +7,7 @@ namespace Environ
     {
         namespace Timer
         {
+            [Serializable]
             public class PauseableTimer
             {
                 public float maxTime;
@@ -21,19 +23,13 @@ namespace Environ
 
                 public void UpdateTimer(float value)
                 {
-                    if (!pause)
-                        if (timer > 0)
-                            timer -= value;
+                    if (!pause && timer > 0)
+                        timer -= value;
                 }
 
                 public void ResetTimer()
                 {
                     timer = maxTime;
-                }
-
-                public bool AtOrBelowZero()
-                {
-                    return timer <= 0;
                 }
 
                 public bool AboveZero()

@@ -11,13 +11,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 562aa1c575b300e4e94b83756cf93cc8, type: 3}
   m_Name: FireDamage
   m_EditorClassIdentifier: 
+  uniqueID: 
+  debugMode: 0
   ID: 1
   damage: 2
-  transferOnCondition: 0
-  regularity: 0
-  limit: 0
-  limitTracker: 0
-  refreshLimits: 0
-  delay: 0.2
-  timeBetweenDamage: 1
-  tbdTimer: 0
+  attackGap:
+    maxTime: 1
+    timer: 0
+    pause: 0
+  delay:
+    maxTime: 0
+    timer: 0
+    pause: 0
+  refreshDelay: 0
+  limitType: 0
+  limit:
+    maxTime: 0
+    timer: 0
+    pause: 0
+  refreshLimit: 0
+  canAttack: 0

@@ -2,13 +2,8 @@
 {
     using UnityEngine;
     using EnvironEnum.GeneralEnum;
-    using EnvironEnum.DamageEnum;
     using EnvironInfo;
     using System.Collections.Generic;
-
-#if UNITY_EDITOR
-    using UnityEditor;
-#endif
 
     public class EnvironObject : MonoBehaviour
     {
@@ -30,11 +25,8 @@
                 if (output[i] == null)
                     output.RemoveAt(i);
                 else
-                {
                     if (SimilarityCheck.IsUnique(output[i].similarity))
-                        output[i] = Instantiate(output[i]);
-                    output[i].SetSourceAndUID(this);
-                }
+                    output[i] = EnvironOutput.SetSourceAndUID(Instantiate(output[i]), this);
             }
 
             effects = new EnvironEffectList();
@@ -47,32 +39,76 @@
         {
             if (effects == null) return;
 
+            effects.CullInputList();
+
             foreach (EnvironOutput e in effects.inputList)
             {
                 if (e.damageI != null)
-                    if (e.damageI.CanAttack())                       //Passes adjusted damage through UpdateLimit
-                        hitPoints -= e.damageI.UpdateLimit(GetAdjustedDamage(e.damageI.damage, e.damageI.ID));
+                    if (e.damageI.CanAttack())
+                        hitPoints -= GetAdjustedDamage(e.damageI, e);
 
                 if (e.appearanceI != null)
-                    e.appearanceI.UpdateAppearance(); 
+                    e.appearanceI.UpdateAppearance();
             }
 
+            ConstrainHitpoints();
+        }
+
+
+        private float GetAdjustedDamage(DamageInfo di, EnvironOutput effect)
+        {
+            float damage = di.damage;
+
+            if (resistances != null)
+                damage = resistances.GetAdjustedDamage(di.damage, di.ID);
+
+            di.UpdateLimit(damage);
+            if (di.removeEffect)
+                effects.FlagForRemoval(effect);
+
+            return damage;
+        }
+
+
+        #region Hitpoint Functions
+        public void ConstrainHitpoints()
+        {
             if (hitPoints < 0)
                 hitPoints = 0;
             if (hitPoints > hitPointLimit)
                 hitPoints = hitPointLimit;
         }
+        #endregion
 
-        private float GetAdjustedDamage(float damage, DType damageID)
+        #region OnTrigger & OnCollision Functions
+        private void OnEnterOrStay(TransferCondition transferCondition, GameObject obj)
         {
-            if (resistances == null)
-                return damage;
+            EnvironObject otherEO = obj.GetComponent<EnvironObject>();
+            if (otherEO == null || output.Count == 0 || otherEO.effects == null)
+                return;
 
-            return resistances.GetAdjustedDamage(damage, damageID);
+            foreach (EnvironOutput eo in output)
+                if (eo.transferCondition == transferCondition)
+                    otherEO.effects.Add(eo, obj.transform);
+        }
+
+        private void OnExit(TransferCondition exit, TerminalCondition terminalCondition, GameObject obj)
+        {
+            EnvironObject otherEO = obj.GetComponent<EnvironObject>();
+            if (otherEO == null || output.Count == 0 || otherEO.effects == null)
+                return;
+
+            foreach (EnvironOutput eo in output)
+            {
+                if (eo.transferCondition == exit)
+                    otherEO.effects.Add(eo, obj.transform);
+
+                if (eo.endOnCondition == terminalCondition)
+                    otherEO.effects.FlagForRemoval(eo);
+            }
         }
 
 
-        #region OnTrigger & OnCollision Functions
         private void OnTriggerEnter(Collider other)
         {
             OnEnterOrStay(TransferCondition.ON_TRIGGER_ENTER, other.gameObject);
@@ -85,7 +121,7 @@
 
         private void OnTriggerExit(Collider other)
         {
-            OnExit(TransferCondition.ON_TRIGGER_EXIT, TransferCondition.ON_TRIGGER_STAY, TerminalCondition.ON_TRIGGER_EXIT, other.gameObject);
+            OnExit(TransferCondition.ON_TRIGGER_EXIT, TerminalCondition.ON_TRIGGER_EXIT, other.gameObject);
         }
 
         private void OnCollisionEnter(Collision collision)
@@ -100,74 +136,8 @@
 
         private void OnCollisionExit(Collision collision)
         {
-            OnExit(TransferCondition.ON_COLLISION_EXIT, TransferCondition.ON_COLLISION_STAY, TerminalCondition.ON_COLLISION_EXIT, collision.gameObject);
+            OnExit(TransferCondition.ON_COLLISION_EXIT, TerminalCondition.ON_COLLISION_EXIT, collision.gameObject);
         }
         #endregion
-
-        private void OnEnterOrStay(TransferCondition enter, GameObject obj)
-        {
-            EnvironObject otherEO = obj.GetComponent<EnvironObject>();
-            if (otherEO == null || output.Count == 0 || otherEO.effects == null)
-                return;
-
-            foreach (EnvironOutput eo in output)
-                if (eo.transferCondition == enter)
-                    otherEO.effects.Add(eo, obj.transform);
-
-            //foreach (EnvironOutput eo in output)
-            //    if (eo.transferOnCondition == enter || eo.transferOnCondition == stay)
-            //        otherEO.effects.Add(eo, obj.transform);
-        }
-
-
-        private void OnExit(TransferCondition exit, TransferCondition stay, TerminalCondition endCondition, GameObject obj)
-        {
-            EnvironObject otherEO = obj.GetComponent<EnvironObject>();
-            if (otherEO == null || output.Count == 0 || otherEO.effects == null)
-                return;
-
-            foreach (EnvironOutput eo in output)
-            {
-                if (eo.transferCondition == exit)
-                    otherEO.effects.Add(eo, obj.transform);
-
-                if (eo.transferCondition == stay || eo.endOnCondition == endCondition)
-                    otherEO.effects.Remove(eo);
-            }
-        }
     }
-
-
-#if UNITY_EDITOR
-    [CustomEditor(typeof(EnvironObject))]
-    public class EnvironObjectEditor : Editor
-    {
-        [HideInInspector] public bool debugMode;
-
-        public override void OnInspectorGUI()
-        {
-            EnvironObject script = (EnvironObject)target;
-            EditorExtender.DrawCustomInspector(this);
-
-            GUILayout.Space(20);
-            EditorGUI.indentLevel += 1;
-            debugMode = EditorGUILayout.Toggle(new GUIContent("Debug Mode", "Shows hidden variables in inspector for debugging purposes"), debugMode);
-            GUILayout.Space(20);
-            if (debugMode)
-            {
-                int i = 0;
-                foreach (EnvironOutput eo in script.output)
-                {
-                    i++;
-                    EditorGUILayout.LabelField("Output " + i + " Unique ID: " + eo.uniqueID);
-                    eo.uniqueID = EditorGUILayout.TextField(eo.uniqueID);
-                }
-
-                if (EditorApplication.isPlaying)
-                    Repaint();
-            }
-            EditorGUI.indentLevel -= 1;
-        }
-    }
-#endif
 }

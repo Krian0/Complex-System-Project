@@ -12,96 +12,29 @@
         [Space(10)]
         public DType ID;
         public float damage;
-        //[HideInInspector] public float attackGap;
-        //[HideInInspector] public float gapTimer;
-        //[HideInInspector] public float delay;
-        //[HideInInspector] public float delayTimer;
+
         [HideInInspector] public PauseableTimer attackGap = new PauseableTimer();
         [HideInInspector] public PauseableTimer delay = new PauseableTimer();
-        [ShowIf("ID", ShowIfAttribute.Compare.NOT_EQUALS, (int)DType.ELECTRICITY)]
-         public bool refreshDelay = false;
+        [HideInInspector] public bool refreshDelay = false;
 
-        [Space(40)]
         [HideInInspector] public DLimit limitType;
-
         [HideInInspector] public PauseableTimer limit = new PauseableTimer();
-        //[HideInInspector] public float limit = 0;
-        //[HideInInspector] public float limitTracker;
-
-        //[HideInInspector] public bool removeOnLimitReached;
-
         [HideInInspector] public bool refreshLimit = false;
+        [HideInInspector] public bool removeOnLimitReached;
 
-        [HideInInspector] public bool canAttackFlag;
-        //[HideInInspector] public bool removeOutputFlag = false;
+        [HideInInspector] public bool canAttack;
+        [HideInInspector] public bool removeEffect;
 
 
         public void Setup()
         {
             delay.ResetTimer();
             attackGap.timer = 0;
-            limit.ResetTimer();
-            //delayTimer = delay;
-            //gapTimer = 0;
-            //limitTracker = limit;
-        }
 
-        public bool CanAttack()
-        {
-            canAttackFlag = false;
-
-            delay.UpdateTimer();
-
-            if (delay.AtOrBelowZero())
-                attackGap.UpdateTimer();
-
-            if (attackGap.AtOrBelowZero())
-            {
-                attackGap.ResetTimer();
-
-                switch (limitType)
-                {
-                    case DLimit.NO_LIMIT:
-                        canAttackFlag = true;
-                        break;
-
-                    case DLimit.TIME_LIMIT:
-                        limit.UpdateTimer();
-                        if (limit.AboveZero())
-                            canAttackFlag = true;
-                        break;
-
-                    case DLimit.ATTACK_LIMIT:
-                        if (limit.AboveZero())
-                        {
-                            canAttackFlag = true;
-                            UpdateLimit(1);
-                        }
-                        break;
-
-                    case DLimit.DAMAGE_LIMIT:
-                        if (limit.AboveZero())
-                            canAttackFlag = true;
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-
-
-            //if (limit.AtOrBelowZero())
-            //    removeOutputFlag = true;
-
-            return canAttackFlag;
-        }
-
-        public float UpdateLimit(float damageValue)
-        {
-            if (limitType == DLimit.DAMAGE_LIMIT && damageValue < 0)
-                limit.UpdateTimer(damageValue);
-
-            return damageValue;
+            if (limitType == DLimit.NO_LIMIT)
+                limit.timer = 1;
+            else
+                limit.ResetTimer();
         }
 
         public void Refresh()
@@ -113,8 +46,47 @@
                 limit.ResetTimer();
         }
 
+        public bool CanAttack()
+        {
+            canAttack = false;
+
+            delay.UpdateTimer();
+            if (!delay.AboveZero())
+            {
+                attackGap.UpdateTimer();
+
+                if (limitType == DLimit.TIME_LIMIT)
+                    limit.UpdateTimer();
+            }
+
+            if (!attackGap.AboveZero())
+            {
+                attackGap.ResetTimer();
+
+                if (limit.AboveZero())
+                    canAttack = true;
+            }
+
+            return canAttack;
+        }
+
+        public void UpdateLimit(float damageValue)
+        {
+            if (limitType == DLimit.NO_LIMIT)
+                return;
+
+            if (limitType == DLimit.DAMAGE_LIMIT && damageValue < 0)
+                limit.UpdateTimer(damageValue);
+
+            else if (limitType == DLimit.ATTACK_LIMIT)
+                limit.UpdateTimer(1);
+
+            if (removeOnLimitReached && !limit.AboveZero())
+                removeEffect = true;
+        }
 
 
+        #region Operator Overrides
         public static bool operator ==(DamageInfo a, DamageInfo b)
         {
             if (ReferenceEquals(a, null) && ReferenceEquals(b, null))
@@ -142,5 +114,6 @@
         {
             return base.GetHashCode();
         }
+        #endregion
     }
 }

@@ -48,6 +48,23 @@
                 appearanceI.uniqueID = GetInstanceID().ToString();
         }
 
+        public static EnvironOutput SetSourceAndUID(EnvironOutput output, EnvironObject eoSource)
+        {
+            if (output == null)
+                return null;
+
+            output.source = eoSource;
+            if (SimilarityCheck.IsStandard(output.similarity) || SimilarityCheck.IsUnique(output.similarity))
+                output.uniqueID = output.GetInstanceID().ToString();
+
+            if (output.damageI)
+                output.damageI.uniqueID = output.GetInstanceID().ToString();
+            if (output.appearanceI)
+                output.appearanceI.uniqueID = output.GetInstanceID().ToString();
+
+            return output;
+        }
+
         public void Setup(Transform objTransform)
         {
             if (damageI != null)
@@ -76,7 +93,8 @@
             if (refreshTimer)
                 limitTimer = timeLimit;
 
-            damageI.Refresh();
+            if (damageI != null)
+                damageI.Refresh();
         }
 
         public void Update()
