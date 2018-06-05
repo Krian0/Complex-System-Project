@@ -7,7 +7,6 @@
 #if UNITY_EDITOR
     using UnityEditor;
     using EnvironGuiContent;
-    using System.Linq;
 #endif
 
     [CreateAssetMenu(fileName = "NewOutput.asset", menuName = "Environ/New Output", order = 1)]
