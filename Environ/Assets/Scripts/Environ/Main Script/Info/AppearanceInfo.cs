@@ -1,11 +1,10 @@
-﻿namespace EnvironInfo
+﻿namespace Environ.Info
 {
     using UnityEngine;
     using System.Collections.Generic;
 
 #if UNITY_EDITOR
     using UnityEditor;
-    using EnvironGuiContent;
 #endif
 
     [CreateAssetMenu(fileName = "NewAppearanceInfo.asset", menuName = "Environ/Info/New AppearanceInfo", order = 1)]

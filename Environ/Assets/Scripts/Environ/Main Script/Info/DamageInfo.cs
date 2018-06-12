@@ -1,10 +1,8 @@
-﻿namespace EnvironInfo
+﻿namespace Environ.Info
 {
     using UnityEngine;
-    using EnvironEnum.DamageEnum;
-    using Environ.Support.Timer;
-
-
+    using Support.Enum.Damage;
+    using Support.Timer;
 
     [CreateAssetMenu(fileName = "NewDamageInfo.asset", menuName = "Environ/Info/New DamageInfo", order = 1)]
     public class DamageInfo : EnvironInfoBase
@@ -22,7 +20,6 @@
         [HideInInspector] public bool refreshLimit = false;
         [HideInInspector] public bool removeOnLimitReached;
 
-        [HideInInspector] public bool canAttack;
         [HideInInspector] public bool removeEffect;
 
 
@@ -48,8 +45,6 @@
 
         public bool CanAttack()
         {
-            canAttack = false;
-
             delay.UpdateTimer();
             if (!delay.AboveZero())
             {
@@ -64,10 +59,10 @@
                 attackGap.ResetTimer();
 
                 if (limit.AboveZero())
-                    canAttack = true;
+                    return true;
             }
 
-            return canAttack;
+            return false;
         }
 
         public void UpdateLimit(float damageValue)

@@ -1,10 +1,10 @@
-﻿namespace EnvironInfo
+﻿namespace Environ.Info
 {
     using UnityEngine;
     using System.Collections.Generic;
-    using EnvironContainers;
-    using EnvironEnum.DamageEnum;
-    using EnvironEnum.ResistanceEnum;
+    using Support.Containers;
+    using Support.Enum.Damage;
+    using Support.Enum.Resistance;
 
     [CreateAssetMenu(fileName = "NewResistanceInfo.asset", menuName = "Environ/Info/New ResistanceInfo", order = 1)]
     public class ResistanceInfo : ScriptableObject

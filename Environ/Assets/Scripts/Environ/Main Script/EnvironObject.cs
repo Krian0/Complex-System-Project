@@ -1,9 +1,10 @@
-﻿namespace Environ
+﻿namespace Environ.Main
 {
     using UnityEngine;
-    using EnvironEnum.GeneralEnum;
-    using EnvironInfo;
     using System.Collections.Generic;
+    using Info;
+    using Support.Enum.General;
+    using Support.EffectList;
 
     public class EnvironObject : MonoBehaviour
     {
@@ -25,7 +26,7 @@
                 if (output[i] == null)
                     output.RemoveAt(i);
                 else
-                    if (SimilarityCheck.IsUnique(output[i].similarity))
+                    if (output[i].similarity == Similarity.UNIQUE)
                     output[i] = EnvironOutput.SetSourceAndUID(Instantiate(output[i]), this);
             }
 
@@ -81,62 +82,65 @@
         #endregion
 
         #region OnTrigger & OnCollision Functions
-        private void OnEnterOrStay(TransferCondition transferCondition, GameObject obj)
+        private void OnEnterOrStay(TransferCondition transferCondition, EnvironObject targetEO)
         {
-            EnvironObject otherEO = obj.GetComponent<EnvironObject>();
-            if (otherEO == null || output.Count == 0 || otherEO.effects == null)
+            if (output.Count == 0 || targetEO == null || targetEO.effects == null)
                 return;
 
-            foreach (EnvironOutput eo in output)
-                if (eo.transferCondition == transferCondition)
-                    otherEO.effects.Add(eo, obj.transform);
+            foreach (EnvironOutput effect in output)
+                if (effect.transferCondition == transferCondition)
+                    targetEO.effects.Add(effect, targetEO, this);
+
+            //Effect Transmission to test
+            foreach (EnvironOutput tEffect in effects.inputList)
+                if (tEffect.allowTransmission)
+                    targetEO.effects.Add(tEffect, targetEO, this);
         }
 
-        private void OnExit(TransferCondition exit, TerminalCondition terminalCondition, GameObject obj)
+        private void OnExit(TransferCondition exit, TerminalCondition terminalCondition, EnvironObject targetEO)
         {
-            EnvironObject otherEO = obj.GetComponent<EnvironObject>();
-            if (otherEO == null || output.Count == 0 || otherEO.effects == null)
+            if (output.Count == 0 || targetEO == null || targetEO.effects == null)
                 return;
 
-            foreach (EnvironOutput eo in output)
+            foreach (EnvironOutput effect in output)
             {
-                if (eo.transferCondition == exit)
-                    otherEO.effects.Add(eo, obj.transform);
+                if (effect.transferCondition == exit)
+                    targetEO.effects.Add(effect, targetEO, this);
 
-                if (eo.endOnCondition == terminalCondition)
-                    otherEO.effects.FlagForRemoval(eo);
+                if (effect.endOnCondition == terminalCondition)
+                    targetEO.effects.FlagForRemoval(effect);
             }
         }
 
 
         private void OnTriggerEnter(Collider other)
         {
-            OnEnterOrStay(TransferCondition.ON_TRIGGER_ENTER, other.gameObject);
+            OnEnterOrStay(TransferCondition.ON_TRIGGER_ENTER, other.GetComponent<EnvironObject>());
         }
 
         private void OnTriggerStay(Collider other)
         {
-            OnEnterOrStay(TransferCondition.ON_TRIGGER_STAY, other.gameObject);
+            OnEnterOrStay(TransferCondition.ON_TRIGGER_STAY, other.GetComponent<EnvironObject>());
         }
 
         private void OnTriggerExit(Collider other)
         {
-            OnExit(TransferCondition.ON_TRIGGER_EXIT, TerminalCondition.ON_TRIGGER_EXIT, other.gameObject);
+            OnExit(TransferCondition.ON_TRIGGER_EXIT, TerminalCondition.ON_TRIGGER_EXIT, other.gameObject.GetComponent<EnvironObject>());
         }
 
         private void OnCollisionEnter(Collision collision)
         {
-            OnEnterOrStay(TransferCondition.ON_COLLISION_ENTER, collision.gameObject);
+            OnEnterOrStay(TransferCondition.ON_COLLISION_ENTER, collision.gameObject.GetComponent<EnvironObject>());
         }
 
         private void OnCollisionStay(Collision collision)
         {
-            OnEnterOrStay(TransferCondition.ON_COLLISION_STAY, collision.gameObject);
+            OnEnterOrStay(TransferCondition.ON_COLLISION_STAY, collision.gameObject.GetComponent<EnvironObject>());
         }
 
         private void OnCollisionExit(Collision collision)
         {
-            OnExit(TransferCondition.ON_COLLISION_EXIT, TerminalCondition.ON_COLLISION_EXIT, collision.gameObject);
+            OnExit(TransferCondition.ON_COLLISION_EXIT, TerminalCondition.ON_COLLISION_EXIT, collision.gameObject.GetComponent<EnvironObject>());
         }
         #endregion
     }

@@ -1,8 +1,8 @@
-﻿namespace EnvironContainers
+﻿namespace Environ.Support.Containers
 {
-    using EnvironEnum.DamageEnum;
-    using EnvironEnum.ResistanceEnum;
     using UnityEngine;
+    using Enum.Damage;
+    using Enum.Resistance;
 
     [System.Serializable]
     public class ResistanceContainer

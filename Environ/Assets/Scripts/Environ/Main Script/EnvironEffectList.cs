@@ -1,9 +1,9 @@
-﻿namespace Environ
+﻿namespace Environ.Support.EffectList
 {
-    using UnityEngine;
     using System.Collections.Generic;
     using System;
-
+    using System.Linq;
+    using Main;
 
     [Serializable]
     public class EnvironEffectList
@@ -12,7 +12,7 @@
         private List<int> cullIndexesList = new List<int>(); 
 
 
-        public void Add(EnvironOutput effect, Transform objTransform)
+        public void Add(EnvironOutput effect, EnvironObject targetEO, EnvironObject lastSourceEO)
         {
             int index = inputList.IndexOf(effect);
 
@@ -22,7 +22,7 @@
             if (index < 0)
             {
                 EnvironOutput newEffect = UnityEngine.Object.Instantiate(effect);
-                newEffect.Setup(objTransform);
+                newEffect.Setup(targetEO, lastSourceEO);
                 inputList.Add(newEffect);
             }
         }
@@ -50,11 +50,11 @@
             if (cullIndexesList.Count == 0)
                 return;
 
-            cullIndexesList.Sort();            //Sorts the indexes in ascending order
-            cullIndexesList.Reverse();         //List is now in descending order
+            cullIndexesList.Sort();                                     //Sorts the indexes in ascending order
+            cullIndexesList = cullIndexesList.Distinct().ToList();      //List now has no duplicates
 
-            for (int i = 0; i < cullIndexesList.Count; i++)
-                Remove(cullIndexesList[i]);
+            for (int i = cullIndexesList.Count - 1; i >= 0; i--)
+                Remove(cullIndexesList[i]);                             //Remove in reverse order to avoid removing the wrong index
         }
 
         private void Remove(int index)
@@ -62,7 +62,7 @@
             if (index >= inputList.Count)
                 return;
 
-            if (inputList[index].appearanceI != null && inputList[index].appearanceI.objectParticle != null)
+            if (inputList[index].appearanceI && inputList[index].appearanceI.objectParticle)
             {
                 inputList[index].appearanceI.objectParticle.Stop();
                 UnityEngine.Object.Destroy(inputList[index].appearanceI.objectParticle.gameObject, 10);

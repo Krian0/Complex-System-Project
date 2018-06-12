@@ -1,6 +1,6 @@
-﻿namespace EnvironEnum
+﻿namespace Environ.Support.Enum
 {
-    namespace GeneralEnum
+    namespace General
     {
         public enum TransferCondition
         {
@@ -22,34 +22,13 @@
 
         public enum Similarity
         {
-            UNIQUE_A = 0,
-            UNIQUE_B,
-            STANDARD_A,
-            STANDARD_B,
-            SELECTIVE_A,
-            SELECTIVE_B
-        }
-
-        struct SimilarityCheck
-        {
-            public static bool IsUnique(Similarity sIndex)
-            {
-                return (sIndex == Similarity.UNIQUE_A || sIndex == Similarity.UNIQUE_B);
-            }
-
-            public static bool IsStandard(Similarity sIndex)
-            {
-                return (sIndex == Similarity.STANDARD_A || sIndex == Similarity.STANDARD_B);
-            }
-
-            public static bool IsSelective(Similarity sIndex)
-            {
-                return (sIndex == Similarity.SELECTIVE_A || sIndex == Similarity.SELECTIVE_B);
-            }
+            UNIQUE = 0,
+            STANDARD,
+            SELECTIVE
         }
     }
 
-    namespace DamageEnum
+    namespace Damage
     {
         public enum DType
         {
@@ -71,7 +50,7 @@
         }
     }
 
-    namespace ResistanceEnum
+    namespace Resistance
     {
         public enum RType
         {
@@ -82,12 +61,12 @@
         }
     }
 
-    namespace AppearanceEnum
+    namespace Appearance
     {
 
     }
 
-    namespace DestructAndSpawnEnum
+    namespace DestructAndSpawn
     {
         public enum DestructOrSpawnCondition
         {
@@ -101,12 +80,14 @@
         }
     }
 
-    //namespace TagEnum
-    //{
-    //    public enum ObjectTag
-    //    {
-    //        PLAYER = 0,
-    //        KILL_ZONE
-    //    }
-    //}
+    namespace Tag
+    {
+        public enum ObjectTag
+        {
+            PLAYER = 0,
+            GRUNT,
+            BOSS,
+            ENVIRONMENT
+        }
+    }
 }

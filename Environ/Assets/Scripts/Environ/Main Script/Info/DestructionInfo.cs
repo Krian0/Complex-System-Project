@@ -1,10 +1,10 @@
-﻿namespace EnvironInfo
+﻿namespace Environ.Info
 {
     //using UnityEngine;
     //using System.Collections.Generic;
-    //using EnvironEnum.DestructAndSpawnEnum;
-    //using EnvironEnum.TagEnum;
-    //using EnvironEnum.DamageEnum;
+    //using Environ.Support.Enum.DestructAndSpawn;
+    //using Environ.Support.Enum.Tag;
+    //using Environ.Support.Enum.Damage;
 
     //[CreateAssetMenu(fileName = "NewDestructionInfo.asset", menuName = "Environ/Info/New DestructionInfo", order = 1)]
     //public class DestructionInfo : ScriptableObject
@@ -16,7 +16,7 @@
     //    public bool spawnObjectOnDestroy;
     //    public GameObject objectToSpawn;
 
-    //    public List<ObjectTag> destructionTags;
-    //    public List<DamageType> destructionTypes;
+    //    public List<ObjectTag> destructionTags; //Multi select list
+    //    public List<DType> destructionTypes;    
     //}
 }

@@ -1,4 +1,4 @@
-﻿namespace EnvironInfo
+﻿namespace Environ.Info
 {
     using UnityEngine;
 

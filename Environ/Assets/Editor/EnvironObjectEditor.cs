@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using Environ;
+using Environ.Main;
 
 [CustomEditor(typeof(EnvironObject))]
 public class EnvironObjectEditor : Editor

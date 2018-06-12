@@ -1,42 +1,36 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Environ
+namespace Environ.Support.Timer
 {
-    namespace Support
+    [Serializable]
+    public class PauseableTimer
     {
-        namespace Timer
+        public float maxTime;
+        public float timer;
+        public bool pause;
+
+        public void UpdateTimer()
         {
-            [Serializable]
-            public class PauseableTimer
-            {
-                public float maxTime;
-                public float timer;
-                public bool pause;
+            if (!pause)
+                if (timer > 0)
+                    timer -= Time.deltaTime;
+        }
 
-                public void UpdateTimer()
-                {
-                    if (!pause)
-                        if (timer > 0)
-                            timer -= Time.deltaTime;
-                }
+        public void UpdateTimer(float value)
+        {
+            if (!pause && timer > 0)
+                timer -= value;
+        }
 
-                public void UpdateTimer(float value)
-                {
-                    if (!pause && timer > 0)
-                        timer -= value;
-                }
+        public void ResetTimer()
+        {
+            timer = maxTime;
+        }
 
-                public void ResetTimer()
-                {
-                    timer = maxTime;
-                }
-
-                public bool AboveZero()
-                {
-                    return timer > 0;
-                }
-            }
+        public bool AboveZero()
+        {
+            return timer > 0;
         }
     }
 }
