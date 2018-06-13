@@ -8,81 +8,138 @@ using Environ.Info;
 public class EnvironOutputEditor : Editor
 {
     [HideInInspector] public bool debugMode;
-    [HideInInspector] public GameObject firstSourceEO = null;
-    [HideInInspector] public GameObject lastSourceEO = null;
-    [HideInInspector] public GameObject targetEO = null;
     [HideInInspector] public bool damageIFold = false;
     [HideInInspector] public bool appearanceIFold = false;
 
 
-    GUIContent transferGUIC = new GUIContent("Transfer Condition", "When this condition is met the Output will be cloned and added as an Effect to the other Environ Object's Effects list, if it doesn't already exist in the list.");
-    GUIContent allowGUIC = new GUIContent("Allow Transmission?", "When True, this option allows the Effect itself to be cloned and added as an Effect on other Environ Objects. When False, only the Output can do so.");
-    GUIContent terminalGUIC = new GUIContent("Terminal Condition", "When this condition is met the Effect will be removed.");
-    GUIContent limitGUIC = new GUIContent("Time Limit", "The time in seconds before the Terminal Condition is met.");
-    GUIContent refreshGUIC = new GUIContent("Refresh Timer?", "When True, if this Effect exists in an Effects list upon a transfer attempt, the Time Limit will be reset.");
+    SerializedProperty similarity;
+    SerializedProperty selectiveCanBeSimilar;
+    SerializedProperty damageSimilarity;
+    SerializedProperty appearanceSimilarity;
+
+    SerializedProperty transferCondition;
+    SerializedProperty allowTransmission;
+    SerializedProperty endOnCondition;
+    SerializedProperty limit;
+
+    SerializedProperty refreshTimer;
 
 
-    string similarityString =
-        "Used to determine when an Effect does or does not exist (is a unique instance) in another Environ Object's Effects list. \n\n\n" +
-        "Unique:     Each original Output ScriptableObject and each clone is a unique instance. \n\n" +
+    SerializedProperty firstSourceEO;
+    SerializedProperty lastSourceEO;
+    SerializedProperty targetEO;
+
+    SerializedProperty damageI;
+    SerializedProperty appearanceI;
+
+    SerializedProperty ID;
+
+    static string similarityString =
+        "Used to determine when an Effect does or does not exist (is a unique instance) in another Environ Object's Effects list. \n\n" +
+        "Unique:      Each original Output ScriptableObject and each clone is a unique instance. \n\n" +
         "Standard:   Each original Output ScriptableObject is a unique instance that their clones share. \n\n" +
-        "Selective:  Will be considered the same as any Output with Info that originates from selected Scriptable Objects.";
+        "Selective:   Will be considered the same as any Output with Info that originates from selected Scriptable Objects.";
+
+    static GUIContent dSimilarityGUIC = new GUIContent("Damage Info", "Input the exact Damage Info ScriptableObject you want this Output to be similar to.");
+    static GUIContent aSimilarityGUIC = new GUIContent("Appearance Info", "Input the exact Appearance Info ScriptableObject you want this Output to be similar to.");
+    static GUIContent sCanBeSimilarGUIC = new GUIContent("Selective Can Be Similar?", "If enabled, this Environ Output will be considered the same as any with the given Info. If disabled, Selective Outputs cannot be similar to this one.");
+    static GUIContent transferGUIC = new GUIContent("Transfer Condition", "When this condition is met the Output will be cloned and added as an Effect to the other Environ Object's Effects list, if it doesn't already exist in the list.");
+    static GUIContent allowGUIC = new GUIContent("Allow Transmission?", "When True, this option allows the Effect itself to be cloned and added as an Effect on other Environ Objects. When False, only the Output can do so.");
+    static GUIContent terminalGUIC = new GUIContent("Terminal Condition", "When this condition is met the Effect will be removed.");
+    static GUIContent limitGUIC = new GUIContent("Time Limit", "The time in seconds before the Terminal Condition is met.");
+    static GUIContent refreshGUIC = new GUIContent("Refresh Timer?", "When True, if this Effect exists in an Effects list upon a transfer attempt, the Time Limit will be reset.");
+    static GUIContent similarityGUIC = new GUIContent("Similarity Index", similarityString);
+    static GUIContent damageIGUIC = new GUIContent("Damage Info");
+    static GUIContent appearanceIGUIC = new GUIContent("Appearance Info");
+    static GUIContent debugGUIC = new GUIContent("Debug Mode", "Shows hidden variables in inspector for debugging purposes");
+    static GUIContent firstSourceGUIC = new GUIContent("First Source EO", "The original source for this Effect");
+    static GUIContent lastSourceGUIC = new GUIContent("Last Source EO", "The most recent source for this Effect");
+    static GUIContent targetGUIC = new GUIContent("Target EO", "The Environ Object this Effect is on");
+    static GUIContent limitTimer = new GUIContent("Limit Timer");
+
+
+
+
+
+    private void OnEnable()
+    {
+        similarity = serializedObject.FindProperty("similarity");
+        selectiveCanBeSimilar = serializedObject.FindProperty("selectiveCanBeSimilar");
+        damageSimilarity = serializedObject.FindProperty("damageSimilarity");
+        appearanceSimilarity = serializedObject.FindProperty("appearanceSimilarity");
+
+        transferCondition = serializedObject.FindProperty("transferCondition");
+        allowTransmission = serializedObject.FindProperty("allowTransmission");
+        endOnCondition = serializedObject.FindProperty("endOnCondition");
+        limit = serializedObject.FindProperty("limit");
+
+        refreshTimer = serializedObject.FindProperty("refreshTimer");
+
+        firstSourceEO = serializedObject.FindProperty("firstSource"); 
+        lastSourceEO = serializedObject.FindProperty("lastSource"); 
+        targetEO = serializedObject.FindProperty("target");
+    
+        damageI = serializedObject.FindProperty("damageI");
+        appearanceI = serializedObject.FindProperty("appearanceI");
+
+        ID = serializedObject.FindProperty("uniqueID");
+    }
 
 
     public override void OnInspectorGUI()
     {
-        EnvironOutput script = (EnvironOutput)target;
+        serializedObject.Update();
         EditorExtender.DrawCustomInspector(this);
 
-        script.similarity = (Similarity)EditorGUILayout.EnumPopup(new GUIContent("Similarity Index", similarityString), script.similarity);
-        if (script.similarity == Similarity.SELECTIVE)
+
+        EditorGUILayout.PropertyField(similarity, similarityGUIC);
+
+        if (similarity.enumValueIndex == (int)Similarity.SELECTIVE)
         {
-            script.selectiveCanBeSimilar = true;
-            script.damageSimilarity = (DamageInfo)EditorGUILayout.ObjectField("Damage Info", script.damageI, typeof(DamageInfo), false);
-            script.appearanceSimilarity = (AppearanceInfo)EditorGUILayout.ObjectField("Appearance Info", script.appearanceSimilarity, typeof(AppearanceInfo), false);
+            selectiveCanBeSimilar.boolValue = true;
+            EditorGUILayout.PropertyField(damageSimilarity, dSimilarityGUIC);
+            EditorGUILayout.PropertyField(appearanceSimilarity, aSimilarityGUIC);
         }
+
         else
-            script.selectiveCanBeSimilar = EditorGUILayout.Toggle("", script.selectiveCanBeSimilar);
+            EditorGUILayout.PropertyField(selectiveCanBeSimilar, sCanBeSimilarGUIC);
+
+        GUILayout.Space(20);
+        
+        EditorGUILayout.PropertyField(transferCondition, transferGUIC);
+        EditorGUILayout.PropertyField(allowTransmission, allowGUIC);
+
+        EditorGUILayout.PropertyField(endOnCondition, terminalGUIC);
+        if (endOnCondition.enumValueIndex == (int)TerminalCondition.ON_TIMER)
+        {
+            EditorGUILayout.PropertyField(limit.FindPropertyRelative("maxTime"), limitGUIC);
+            EditorGUILayout.PropertyField(refreshTimer, refreshGUIC);
+        }
 
         GUILayout.Space(20);
 
-        script.transferCondition = (TransferCondition)EditorGUILayout.EnumPopup(transferGUIC, script.transferCondition);
-        script.allowTransmission = EditorGUILayout.Toggle(allowGUIC, script.allowTransmission);
 
-        if (script.transferCondition != TransferCondition.ON_COLLISION_STAY && script.transferCondition != TransferCondition.ON_TRIGGER_STAY)
-        {
-            script.endOnCondition = (TerminalCondition)EditorGUILayout.EnumPopup(terminalGUIC, script.endOnCondition);
-            if (script.endOnCondition == TerminalCondition.ON_TIMER)
-            {
-                script.timeLimit = EditorGUILayout.FloatField(limitGUIC, script.timeLimit);
-                script.refreshTimer = EditorGUILayout.Toggle(refreshGUIC, script.refreshTimer);
-            }
-
-            GUILayout.Space(20);
-        }
-
-
-        script.damageI = (DamageInfo)EditorGUILayout.ObjectField("Damage Info", script.damageI, typeof(DamageInfo), false);
-        if (script.damageI != null)
+        EditorGUILayout.PropertyField(damageI, damageIGUIC);
+        if (damageI.objectReferenceValue != null)
         {
             EditorGUI.indentLevel += 2;
 
             damageIFold = EditorGUILayout.Foldout(damageIFold, "Extended View");
             if (damageIFold)
-                CreateEditor(script.damageI).OnInspectorGUI();
+                CreateEditor(damageI.objectReferenceValue).OnInspectorGUI();
 
             EditorGUI.indentLevel -= 2;
             GUILayout.Space(20);
         }
 
-        script.appearanceI = (AppearanceInfo)EditorGUILayout.ObjectField("Appearance Info", script.appearanceI, typeof(AppearanceInfo), false);
-        if (script.appearanceI != null)
+        EditorGUILayout.PropertyField(appearanceI, appearanceIGUIC);
+        if (appearanceI.objectReferenceValue != null)
         {
             EditorGUI.indentLevel += 2;
 
             appearanceIFold = EditorGUILayout.Foldout(appearanceIFold, "Extended View");
             if (appearanceIFold)
-                CreateEditor(script.appearanceI).OnInspectorGUI();
+                CreateEditor(appearanceI.objectReferenceValue).OnInspectorGUI();
 
             EditorGUI.indentLevel -= 2;
             GUILayout.Space(20);
@@ -90,30 +147,40 @@ public class EnvironOutputEditor : Editor
 
         //script.destructionI = (destructionInfo)EditorGUILayout.ObjectField("Destruction Info", script.destructionI, typeof(destructionInfo), false);
 
+        ShowDebug();
 
+
+        serializedObject.ApplyModifiedProperties();
+    }
+
+    public void ShowDebug()
+    {
         GUILayout.Space(20);
         EditorGUI.indentLevel += 1;
-        debugMode = EditorGUILayout.Toggle(new GUIContent("Debug Mode", "Shows hidden variables in inspector for debugging purposes"), debugMode);
-        if (debugMode)
+
+        debugMode = EditorGUILayout.Toggle(debugGUIC, debugMode);
+        if (debugMode == true)
         {
             EditorGUILayout.Space();
-            if (script.firstSource != null)
-                firstSourceEO = (GameObject)EditorGUILayout.ObjectField("First Source", script.firstSource.gameObject, typeof(GameObject), false);
-            if (script.lastSource != null)
-                lastSourceEO = (GameObject)EditorGUILayout.ObjectField("Last Source", script.lastSource.gameObject, typeof(GameObject), false);
-            if (script.target != null)
-                targetEO = (GameObject)EditorGUILayout.ObjectField("Target", script.target.gameObject, typeof(GameObject), false);
+            if (firstSourceEO.objectReferenceValue != null)
+                EditorGUILayout.PropertyField(firstSourceEO, firstSourceGUIC);
+            if (lastSourceEO.objectReferenceValue != null)
+                EditorGUILayout.PropertyField(lastSourceEO, lastSourceGUIC);
+            if (targetEO.objectReferenceValue != null)
+                EditorGUILayout.PropertyField(targetEO, targetGUIC);
             EditorGUILayout.Space();
 
-            if (script.endOnCondition == TerminalCondition.ON_TIMER)
-                script.limitTimer = EditorGUILayout.FloatField("Terminal Condition Timer", script.limitTimer);
+            if (endOnCondition.enumValueIndex == (int)TerminalCondition.ON_TIMER)
+                EditorGUILayout.PropertyField(limit.FindPropertyRelative("timer"), limitTimer);
             GUILayout.Space(20);
 
-            EditorGUILayout.SelectableLabel("Unique ID: " + script.uniqueID);
+
+            EditorGUILayout.SelectableLabel("Unique ID: " + ID.stringValue);
 
             if (EditorApplication.isPlaying)
                 Repaint();
         }
+
         EditorGUI.indentLevel -= 1;
     }
 }

@@ -11,14 +11,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2d3499eba882764bb49d7b358b44895, type: 3}
   m_Name: TestOut
   m_EditorClassIdentifier: 
-  transferOnCondition: 0
+  transferCondition: 2
   allowTransmission: 0
+  similarity: 1
+  selectiveCanBeSimilar: 1
+  damageSimilarity: {fileID: 0}
+  appearanceSimilarity: {fileID: 0}
   endOnCondition: 0
   refreshTimer: 0
-  timeLimit: 0
-  limitTimer: 0
+  limit:
+    maxTime: 0
+    timer: 0
+    pause: 0
   damageI: {fileID: 0}
   appearanceI: {fileID: 0}
-  source: {fileID: 0}
+  firstSource: {fileID: 0}
+  lastSource: {fileID: 0}
   target: {fileID: 0}
   uniqueID: 0

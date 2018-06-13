@@ -11,15 +11,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2d3499eba882764bb49d7b358b44895, type: 3}
   m_Name: FireOutput
   m_EditorClassIdentifier: 
-  transferCondition: 0
-  allowTransmission: 0
+  transferCondition: 5
+  allowTransmission: 1
   similarity: 1
+  selectiveCanBeSimilar: 0
+  damageSimilarity: {fileID: 0}
+  appearanceSimilarity: {fileID: 0}
   endOnCondition: 2
-  refreshTimer: 0
-  timeLimit: 10
-  limitTimer: 0
+  refreshTimer: 1
+  limit:
+    maxTime: 10
+    timer: 0
+    pause: 0
   damageI: {fileID: 11400000, guid: 0ad09ecb5e41ea9478d59d1cfb77da06, type: 2}
   appearanceI: {fileID: 11400000, guid: f7438cdbf5a69cc4abe1b8aab9a7713e, type: 2}
-  source: {fileID: 0}
+  firstSource: {fileID: 0}
+  lastSource: {fileID: 0}
   target: {fileID: 0}
   uniqueID: 2294

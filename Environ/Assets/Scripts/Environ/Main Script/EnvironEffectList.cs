@@ -55,6 +55,8 @@
 
             for (int i = cullIndexesList.Count - 1; i >= 0; i--)
                 Remove(cullIndexesList[i]);                             //Remove in reverse order to avoid removing the wrong index
+
+            cullIndexesList.Clear();
         }
 
         private void Remove(int index)
@@ -65,7 +67,7 @@
             if (inputList[index].appearanceI && inputList[index].appearanceI.objectParticle)
             {
                 inputList[index].appearanceI.objectParticle.Stop();
-                UnityEngine.Object.Destroy(inputList[index].appearanceI.objectParticle.gameObject, 10);
+                UnityEngine.Object.Destroy(inputList[index].appearanceI.objectParticle.gameObject, 4);
             }
 
             inputList.RemoveAt(index);

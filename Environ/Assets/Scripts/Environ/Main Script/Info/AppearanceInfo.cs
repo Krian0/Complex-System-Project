@@ -2,27 +2,25 @@
 {
     using UnityEngine;
     using System.Collections.Generic;
+    using Environ.Support.Enum.Damage;
 
 #if UNITY_EDITOR
     using UnityEditor;
+    using System.Linq;
 #endif
 
     [CreateAssetMenu(fileName = "NewAppearanceInfo.asset", menuName = "Environ/Info/New AppearanceInfo", order = 1)]
-    public class AppearanceInfo : ScriptableObject
+    public class AppearanceInfo : EnvironInfoBase
     {
         [Space(10)]
         public ParticleSystem objectParticle;
-        public Material objectMaterial;
+        public Material objectMaterial; //implement this
 
-        [HideInInspector] public bool particlesOn;
-        [HideInInspector] public bool materialOn;
+        public bool particlesOn;
+        public bool materialOn;         //and this
 
-        [HideInInspector]
-        public string uniqueID = "0";
-
-#if UNITY_EDITOR
-        [HideInInspector] public bool debugMode;
-#endif
+        public bool hideOnResistance;
+        public List<DType> hideIDList;
 
 
         public void Setup(Transform objTransform)
@@ -50,8 +48,6 @@
 
         public void UpdateAppearance()
         {
-
-
             if (particlesOn && !objectParticle.isPlaying)
                 objectParticle.Play();
 
@@ -64,6 +60,13 @@
 
         }
 
+        public List<DType> GetDistinctHideIDList()
+        {
+            return hideIDList.Distinct().ToList();
+        }
+
+
+        #region Operator Overrides
         public static bool operator ==(AppearanceInfo a, AppearanceInfo b)
         {
             if (ReferenceEquals(a, null) && ReferenceEquals(b, null))
@@ -91,28 +94,67 @@
         {
             return base.GetHashCode();
         }
+        #endregion
     }
 
 #if UNITY_EDITOR
     [CustomEditor(typeof(AppearanceInfo))]
     public class AppearanceInfoEditor : Editor
     {
+
+        SerializedProperty objectParticle;
+        SerializedProperty objectMaterial;
+
+        SerializedProperty particlesOn;
+        SerializedProperty materialOn;
+
+        SerializedProperty hideOnResistance;
+        SerializedProperty hideIDList;
+
+        SerializedProperty debugMode;
+
+        private void OnEnable()
+        {
+            objectParticle = serializedObject.FindProperty("objectParticle"); ;
+            objectMaterial = serializedObject.FindProperty("objectMaterial"); ;
+
+            particlesOn = serializedObject.FindProperty("particlesOn"); ;
+            materialOn = serializedObject.FindProperty("materialOn"); ;
+
+            hideOnResistance = serializedObject.FindProperty("hideOnResistance"); ;
+            hideIDList = serializedObject.FindProperty("hideIDList");
+
+            debugMode = serializedObject.FindProperty("debugMode");
+        }
+
         public override void OnInspectorGUI()
         {
-            AppearanceInfo script = (AppearanceInfo)target;
+            serializedObject.Update();
 
-            EditorExtender.DrawCustomInspector(this);
+            EditorGUILayout.PropertyField(objectParticle);
+            EditorGUILayout.PropertyField(objectMaterial);
+
+            EditorGUILayout.Space();
+
+            EditorGUILayout.PropertyField(hideOnResistance);
+
+            if (hideOnResistance.boolValue)
+                EditorGUILayout.PropertyField(hideIDList, true);
+
             GUILayout.Space(20);
 
+
             EditorGUI.indentLevel += 1;
-            script.debugMode = EditorGUILayout.Toggle(new GUIContent("Debug Mode", "Shows hidden variables in inspector for debugging purposes"), script.debugMode);
-            if (script.debugMode)
+            EditorGUILayout.PropertyField(debugMode, new GUIContent("Debug Mode", "Shows hidden variables in inspector for debugging purposes"));
+            if (debugMode.boolValue)
             {
                 EditorGUILayout.Space();
-                script.particlesOn = EditorGUILayout.Toggle("Particles On", script.particlesOn);
-                script.materialOn = EditorGUILayout.Toggle("Material On", script.materialOn);
+                EditorGUILayout.PropertyField(particlesOn);
+                EditorGUILayout.PropertyField(materialOn);
             }
             EditorGUI.indentLevel -= 1;
+
+            serializedObject.ApplyModifiedProperties();
         }
     }
 #endif

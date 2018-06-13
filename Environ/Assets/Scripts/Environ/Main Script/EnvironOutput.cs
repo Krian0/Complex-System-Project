@@ -4,6 +4,9 @@
     using Info;
     using Support.Enum.General;
     using Support.Timer;
+    using Environ.Support.Enum.Damage;
+    using System.Collections.Generic;
+    using System.Linq;
 
     [CreateAssetMenu(fileName = "NewOutput.asset", menuName = "Environ/New Output", order = 1)]
     public class EnvironOutput : ScriptableObject
@@ -21,8 +24,8 @@
         [HideInInspector] public TerminalCondition endOnCondition;
 
         [HideInInspector] public bool refreshTimer = false;
-        [HideInInspector] public float timeLimit;
-        [HideInInspector] public float limitTimer;
+        //[HideInInspector] public float timeLimit;
+        //[HideInInspector] public float limitTimer;
         [HideInInspector] public PauseableTimer limit; // replace above with this
 
         [HideInInspector] public DamageInfo damageI;
@@ -84,14 +87,29 @@
 
             if (appearanceI)
             {
-                appearanceI = Instantiate(appearanceI);
-                appearanceI.Setup(targetEO.transform);
+                if (appearanceI.hideOnResistance && targetEO.resistances)
+                {
+                    if (targetEO.resistances.ContainsResistanceToID(appearanceI.GetDistinctHideIDList()))
+                        Debug.Log("Appearance Not Added: Target contains a resistance to a selected hide ID");
+
+                    else
+                    {
+                        appearanceI = Instantiate(appearanceI);
+                        appearanceI.Setup(targetEO.transform);
+                    }
+                }
+
+                else
+                {
+                    appearanceI = Instantiate(appearanceI);
+                    appearanceI.Setup(targetEO.transform);
+                }
             }
 
             //if (destructionI)
             //    destructionI = Instantiate(destructionI);
 
-            limitTimer = timeLimit;
+            limit.ResetTimer();
             lastSource = lastSourceEO;
             target = targetEO;
 
@@ -102,7 +120,7 @@
         public void Refresh()
         {
             if (refreshTimer)
-                limitTimer = timeLimit;
+                limit.ResetTimer();
 
             if (damageI != null)
                 damageI.Refresh();
@@ -110,8 +128,8 @@
 
         public void Update()
         {
-            if (limitTimer > 0)
-                limitTimer -= Time.deltaTime;
+            if (limit.AboveZero())
+                limit.UpdateTimer();
         }
 
 

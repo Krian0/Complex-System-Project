@@ -30,4 +30,5 @@ MonoBehaviour:
     timer: 0
     pause: 0
   refreshLimit: 0
-  canAttack: 0
+  removeOnLimitReached: 0
+  removeEffect: 0

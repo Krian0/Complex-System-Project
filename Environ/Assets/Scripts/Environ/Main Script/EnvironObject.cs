@@ -12,7 +12,7 @@
         public float hitPoints;
 
         public ResistanceInfo resistances;
-        public AppearanceInfo appearance;
+        public AppearanceInfo appearance; // implement this
         //public List<DestructionInfo> destroyConditions;
 
         public List<EnvironOutput> output;
@@ -40,16 +40,25 @@
         {
             if (effects == null) return;
 
+            if (effects.inputList.Count > 0)
+                Debug.Log("ONE");
+
             effects.CullInputList();
 
             foreach (EnvironOutput e in effects.inputList)
             {
+                if (e.endOnCondition == TerminalCondition.ON_TIMER)
+                    e.limit.UpdateTimer();
+
                 if (e.damageI != null)
                     if (e.damageI.CanAttack())
                         hitPoints -= GetAdjustedDamage(e.damageI, e);
 
                 if (e.appearanceI != null)
                     e.appearanceI.UpdateAppearance();
+
+                if (!e.limit.AboveZero())
+                    effects.FlagForRemoval(e);
             }
 
             ConstrainHitpoints();
@@ -84,7 +93,7 @@
         #region OnTrigger & OnCollision Functions
         private void OnEnterOrStay(TransferCondition transferCondition, EnvironObject targetEO)
         {
-            if (output.Count == 0 || targetEO == null || targetEO.effects == null)
+            if (targetEO == null || targetEO.effects == null)
                 return;
 
             foreach (EnvironOutput effect in output)
@@ -99,7 +108,7 @@
 
         private void OnExit(TransferCondition exit, TerminalCondition terminalCondition, EnvironObject targetEO)
         {
-            if (output.Count == 0 || targetEO == null || targetEO.effects == null)
+            if (targetEO == null || targetEO.effects == null)
                 return;
 
             foreach (EnvironOutput effect in output)

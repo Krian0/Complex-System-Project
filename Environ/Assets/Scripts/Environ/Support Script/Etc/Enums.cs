@@ -1,5 +1,14 @@
 ﻿namespace Environ.Support.Enum
 {
+
+    //
+    //
+    //          https://lindseyreidblog.wordpress.com/page/1/
+    //
+    //
+
+
+
     namespace General
     {
         public enum TransferCondition
@@ -30,6 +39,7 @@
 
     namespace Damage
     {
+        [System.Serializable]
         public enum DType
         {
             NULL = 0,

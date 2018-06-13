@@ -11,12 +11,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7187fe1bbf92f1642b27c3926ac2b179, type: 3}
   m_Name: FireAppearance
   m_EditorClassIdentifier: 
+  uniqueID: 0
+  debugMode: 0
   objectParticle: {fileID: 198188649618466196, guid: ce44be986bd8d494c818ec18af599669,
     type: 2}
-  anchorPoint: {fileID: 0}
-  objectTexture: {fileID: 0}
   objectMaterial: {fileID: 0}
   particlesOn: 0
-  textureOn: 0
   materialOn: 0
-  debugMode: 0
+  hideOnResistance: 1
+  hideIDList: 01000000

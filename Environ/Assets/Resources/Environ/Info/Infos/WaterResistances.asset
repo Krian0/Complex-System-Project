@@ -13,6 +13,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resistanceList:
   - resistanceID: 1
-    resistType: 2
+    resistType: 0
     resistPercent: 100
   addToDamageDelay: 0
