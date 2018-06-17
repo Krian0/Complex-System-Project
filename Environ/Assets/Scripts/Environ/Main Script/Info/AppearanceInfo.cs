@@ -48,11 +48,23 @@
 
         public void UpdateAppearance()
         {
+            if (objectParticle == null)
+                return;
+
             if (particlesOn && !objectParticle.isPlaying)
                 objectParticle.Play();
 
             else if (!particlesOn)
                 objectParticle.Stop();
+        }
+
+        public void StopAndDestroy()
+        {
+            if (objectParticle)
+            {
+                objectParticle.Stop();
+                Destroy(objectParticle.gameObject, 4);
+            }
         }
 
         private void AddMaterial(MeshRenderer mRenderer)

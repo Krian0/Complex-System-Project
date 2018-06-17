@@ -10,6 +10,8 @@
         [Space(10)]
         public DType ID;
         public float damage;
+        [HideInInspector] public bool dynamicDamage;
+        [HideInInspector] public float adjustedDamage;
 
         [HideInInspector] public PauseableTimer attackGap = new PauseableTimer();
         [HideInInspector] public PauseableTimer delay = new PauseableTimer();
@@ -23,7 +25,7 @@
         [HideInInspector] public bool removeEffect;
 
 
-        public void Setup()
+        public void Setup(Main.EnvironObject targetEO)
         {
             delay.ResetTimer();
             attackGap.timer = 0;
@@ -32,6 +34,9 @@
                 limit.timer = 1;
             else
                 limit.ResetTimer();
+
+            if (!dynamicDamage)
+                adjustedDamage = targetEO.resistances != null ? targetEO.resistances.GetAdjustedDamage(damage, ID) : damage;
         }
 
         public void Refresh()
@@ -49,7 +54,6 @@
             if (!delay.AboveZero())
             {
                 attackGap.UpdateTimer();
-
                 if (limitType == DLimit.TIME_LIMIT)
                     limit.UpdateTimer();
             }
@@ -57,7 +61,6 @@
             if (!attackGap.AboveZero())
             {
                 attackGap.ResetTimer();
-
                 if (limit.AboveZero())
                     return true;
             }
@@ -70,11 +73,11 @@
             if (limitType == DLimit.NO_LIMIT)
                 return;
 
-            if (limitType == DLimit.DAMAGE_LIMIT && damageValue < 0)
+            if (limitType == DLimit.DAMAGE_LIMIT && damageValue > 0)        //Won't update the damage limit if it heals (damage has negative value)
                 limit.UpdateTimer(damageValue);
 
             else if (limitType == DLimit.ATTACK_LIMIT)
-                limit.UpdateTimer(1);
+                limit.UpdateTimer(1.00f);
 
             if (removeOnLimitReached && !limit.AboveZero())
                 removeEffect = true;

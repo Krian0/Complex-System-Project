@@ -6,6 +6,7 @@ using Environ.Support.Enum.Damage;
 [CustomEditor(typeof(DamageInfo))]
 public class DamageInfoEditor : Editor
 {
+    SerializedProperty dynamicDamage;
     SerializedProperty attackGap;
     SerializedProperty delay;
     SerializedProperty refreshDelay;
@@ -18,21 +19,23 @@ public class DamageInfoEditor : Editor
     SerializedProperty debugMode;
     SerializedProperty removeEffect;
 
-    GUIContent attackGUIC = new GUIContent("Attack Gap", "The time in seconds that should pass between each attack");
-    GUIContent delayGUIC = new GUIContent("Initial Attack Delay", "The time in seconds to delay the initial attack");
-    GUIContent refreshDelayGUIC = new GUIContent("Refresh Delay?", "Attack delay will reset if the Output already exists as an Effect on an Environ Object. False: Disable, True: Enable");
-    GUIContent limitGUIC = new GUIContent("Limit Type", "Controls when the damage should stop");
-    GUIContent limitNumGUIC = new GUIContent("Limit Number", "Counts down based on Limit choice. Attacks can only be made when the Limit is above 0");
-    GUIContent refreshlimitGUIC = new GUIContent("Refresh Limit?", "Controls whether the Limit should reset if the Effect already exists on an object");
-    GUIContent removeOnLimitGUIC = new GUIContent("Remove on Limit Reached", "If enabled, will remove the Effect this Info is contained in on Limit reaching 0");
-    GUIContent debugGUIC = new GUIContent("Debug Mode", "Shows hidden variables in inspector for debugging purposes");
-    GUIContent gapTimerGUIC = new GUIContent("Gap Timer");
-    GUIContent delayTimerGUIC = new GUIContent("Delay Timer");
+    GUIContent dynamicGUIC = new GUIContent("Dynamic Damage", "When Enabled: Damage will be calculated with Target resistance each attack. \nWhen Disabled: Damage will be calculated with Target resistance once upon the Effect being added to the Target.");
+    GUIContent attackGUIC = new GUIContent("Attack Gap", "The time in seconds that should pass between each attack.");
+    GUIContent delayGUIC = new GUIContent("Attack Delay", "The time in seconds to delay the initial attack.");
+    GUIContent refreshDelayGUIC = new GUIContent("Refresh Delay", "When Enabled: If the Transfer Condition is met when this Effect exists on the target, the Attack Delay timer will be reset. \nWhen Disabled: No effect.");
+    GUIContent limitGUIC = new GUIContent("Limit Type", "Controls the type of Limit for when the damage should stop.");
+    GUIContent limitNumGUIC = new GUIContent("Limit Number", "Counts down based on Limit choice. Attacks can only be made when the Limit is above 0.");
+    GUIContent refreshlimitGUIC = new GUIContent("Refresh Limit", "When Enabled: If the Transfer Condition is met when this Effect exists on the target, the Limit tracker will be reset. \nWhen Disabled: No effect.");
+    GUIContent removeOnLimitGUIC = new GUIContent("Remove on Limit Reached", "When Enabled: Upon the Limit reaching 0, this Effect will be removed from the Target. \nWhen Disabled: No effect.");
+    GUIContent debugGUIC = new GUIContent("Debug Mode", "Shows hidden variables in the inspector for debugging purposes.");
+    GUIContent gapTimerGUIC = new GUIContent("Attack Gap Timer");
+    GUIContent delayTimerGUIC = new GUIContent("Attack Delay Timer");
     GUIContent LimitTrackerGUIC = new GUIContent("Limit Tracker");
 
 
     private void OnEnable()
     {
+        dynamicDamage = serializedObject.FindProperty("dynamicDamage");
         attackGap = serializedObject.FindProperty("attackGap");
         delay = serializedObject.FindProperty("delay");
         refreshDelay = serializedObject.FindProperty("refreshDelay");
@@ -52,6 +55,7 @@ public class DamageInfoEditor : Editor
 
         EditorExtender.DrawCustomInspector(this);
         EditorGUILayout.PropertyField(attackGap.FindPropertyRelative("maxTime"), attackGUIC);
+        EditorGUILayout.PropertyField(dynamicDamage, dynamicGUIC);
         EditorGUILayout.Space();
 
         EditorGUILayout.PropertyField(delay.FindPropertyRelative("maxTime"), delayGUIC);

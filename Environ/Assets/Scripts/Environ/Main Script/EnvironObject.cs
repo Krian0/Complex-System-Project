@@ -21,13 +21,14 @@
 
         void Start()
         {
-            for (int i = output.Count - 1; i >= 0; i--)
+            output.RemoveAll(o => o == null);
+
+            for (int i = 0; i < output.Count; i++)
             {
-                if (output[i] == null)
-                    output.RemoveAt(i);
-                else
-                    if (output[i].similarity == Similarity.UNIQUE)
-                    output[i] = EnvironOutput.SetSourceAndUID(Instantiate(output[i]), this);
+                output[i].firstSource = this;
+
+                if (output[i].similarity == Similarity.UNIQUE)
+                    output[i] = EnvironOutput.SetSourceAndUID(Instantiate(output[i]));
             }
 
             effects = new EnvironEffectList();
@@ -38,44 +39,39 @@
 
         private void Update()
         {
-            if (effects == null) return;
-
-            if (effects.inputList.Count > 0)
-                Debug.Log("ONE");
+            if (effects == null)
+                return;
 
             effects.CullInputList();
 
             foreach (EnvironOutput e in effects.inputList)
             {
                 if (e.endOnCondition == TerminalCondition.ON_TIMER)
+                {
                     e.limit.UpdateTimer();
+                    effects.ConditionalFlagForRemoval(!e.limit.AboveZero(), e);
+                }
 
-                if (e.damageI != null)
-                    if (e.damageI.CanAttack())
-                        hitPoints -= GetAdjustedDamage(e.damageI, e);
+                if (e.damageI != null && e.damageI.CanAttack())
+                {
+                    hitPoints -= GetAdjustedDamage(e.damageI);
+                    effects.ConditionalFlagForRemoval(e.damageI.removeEffect, e);
+                }
 
                 if (e.appearanceI != null)
                     e.appearanceI.UpdateAppearance();
-
-                if (!e.limit.AboveZero())
-                    effects.FlagForRemoval(e);
             }
 
             ConstrainHitpoints();
         }
 
 
-        private float GetAdjustedDamage(DamageInfo di, EnvironOutput effect)
+        private float GetAdjustedDamage(DamageInfo di)
         {
-            float damage = di.damage;
-
-            if (resistances != null)
-                damage = resistances.GetAdjustedDamage(di.damage, di.ID);
+            //If dynamicDamage, damage = (if resistances exist) resistance adjusted damage, or di.damage. Else, damage = di.adjustedDamage.
+            float damage = di.dynamicDamage ? (resistances != null ? resistances.GetAdjustedDamage(di.damage, di.ID) : di.damage) : di.adjustedDamage;
 
             di.UpdateLimit(damage);
-            if (di.removeEffect)
-                effects.FlagForRemoval(effect);
-
             return damage;
         }
 
@@ -83,12 +79,10 @@
         #region Hitpoint Functions
         public void ConstrainHitpoints()
         {
-            if (hitPoints < 0)
-                hitPoints = 0;
-            if (hitPoints > hitPointLimit)
-                hitPoints = hitPointLimit;
+            hitPoints = Mathf.Clamp(hitPoints, 0, hitPointLimit);
         }
         #endregion
+
 
         #region OnTrigger & OnCollision Functions
         private void OnEnterOrStay(TransferCondition transferCondition, EnvironObject targetEO)
@@ -100,9 +94,8 @@
                 if (effect.transferCondition == transferCondition)
                     targetEO.effects.Add(effect, targetEO, this);
 
-            //Effect Transmission to test
             foreach (EnvironOutput tEffect in effects.inputList)
-                if (tEffect.allowTransmission)
+                if (tEffect.allowTransmission && tEffect.transferCondition == transferCondition)
                     targetEO.effects.Add(tEffect, targetEO, this);
         }
 
@@ -110,6 +103,10 @@
         {
             if (targetEO == null || targetEO.effects == null)
                 return;
+
+            foreach (EnvironOutput tEffect in effects.inputList)
+                if (tEffect.allowTransmission && tEffect.transferCondition == exit)
+                    targetEO.effects.Add(tEffect, targetEO, this);
 
             foreach (EnvironOutput effect in output)
             {

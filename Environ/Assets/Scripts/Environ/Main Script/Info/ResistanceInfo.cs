@@ -20,7 +20,7 @@
             if (rc == null)
                 return damage;
 
-            float decimalPercent = (rc.resistPercent / 100);
+            float decimalPercent = rc.resistPercent / 100;
             switch (rc.resistType)
             {
                 case RType.HEAL:

@@ -43,8 +43,6 @@
 
         public void SetSourceAndUID(EnvironObject eoSource)
         {
-            firstSource = eoSource;
-
             if (damageI)
                 damageI.uniqueID = GetInstanceID().ToString();
             if (appearanceI)
@@ -54,15 +52,13 @@
                 uniqueID = "SELECTIVE - This EnvironObject is the same as any other EnvironObject containing Info with matching IDs";
             else
                 uniqueID = GetInstanceID().ToString();
-
         }
 
-        public static EnvironOutput SetSourceAndUID(EnvironOutput output, EnvironObject firstSourceEO)
+        public static EnvironOutput SetSourceAndUID(EnvironOutput output)
         {
             if (output == null)
                 return null;
 
-            output.firstSource = firstSourceEO;
 
             if (output.damageI)
                 output.damageI.uniqueID = output.GetInstanceID().ToString();
@@ -82,7 +78,7 @@
             if (damageI)
             {
                 damageI = Instantiate(damageI);
-                damageI.Setup();
+                damageI.Setup(targetEO);
             }
 
             if (appearanceI)

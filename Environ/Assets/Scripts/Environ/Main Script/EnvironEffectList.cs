@@ -4,73 +4,51 @@
     using System;
     using System.Linq;
     using Main;
+    using Timer;
 
     [Serializable]
     public class EnvironEffectList
     {
         public List<EnvironOutput> inputList = new List<EnvironOutput>();
-        private List<int> cullIndexesList = new List<int>(); 
+        private List<EnvironOutput> cullList = new List<EnvironOutput>(); 
 
 
         public void Add(EnvironOutput effect, EnvironObject targetEO, EnvironObject lastSourceEO)
         {
-            int index = inputList.IndexOf(effect);
+            List<EnvironOutput> similarEffectList = inputList.FindAll(sEffect => sEffect == effect);
 
-            if (index >= 0)
-                inputList[index].Refresh();
-
-            if (index < 0)
+            if (similarEffectList.Count == 0)
             {
-                EnvironOutput newEffect = UnityEngine.Object.Instantiate(effect);
-                newEffect.Setup(targetEO, lastSourceEO);
-                inputList.Add(newEffect);
+                inputList.Add(UnityEngine.Object.Instantiate(effect));
+                inputList[inputList.Count - 1].Setup(targetEO, lastSourceEO);
             }
+
+            foreach (EnvironOutput eo in similarEffectList)
+                eo.Refresh();
+        }
+
+        public void ConditionalFlagForRemoval(bool value, EnvironOutput effect)
+        {
+            if (value)
+                cullList.Add(effect);
         }
 
         public void FlagForRemoval(EnvironOutput effect)
         {
-            int index = inputList.IndexOf(effect);
-
-            if (index < 0 || cullIndexesList.Contains(index))
-                return;
-
-            cullIndexesList.Add(index);
-        }
-
-        public void FlagForRemoval(int index)
-        {
-            if (index < 0 || index >= inputList.Count || cullIndexesList.Contains(index))
-                return;
-
-            cullIndexesList.Add(index);
+            cullList.Add(effect);
         }
 
         public void CullInputList()
         {
-            if (cullIndexesList.Count == 0)
-                return;
+            foreach (EnvironOutput eo in cullList)
+                if (eo.appearanceI)
+                    eo.appearanceI.StopAndDestroy();
 
-            cullIndexesList.Sort();                                     //Sorts the indexes in ascending order
-            cullIndexesList = cullIndexesList.Distinct().ToList();      //List now has no duplicates
+            var setToRemove = new HashSet<EnvironOutput>(cullList);
+            inputList.RemoveAll(x => setToRemove.Contains(x));
+            
 
-            for (int i = cullIndexesList.Count - 1; i >= 0; i--)
-                Remove(cullIndexesList[i]);                             //Remove in reverse order to avoid removing the wrong index
-
-            cullIndexesList.Clear();
-        }
-
-        private void Remove(int index)
-        {
-            if (index >= inputList.Count)
-                return;
-
-            if (inputList[index].appearanceI && inputList[index].appearanceI.objectParticle)
-            {
-                inputList[index].appearanceI.objectParticle.Stop();
-                UnityEngine.Object.Destroy(inputList[index].appearanceI.objectParticle.gameObject, 4);
-            }
-
-            inputList.RemoveAt(index);
+            cullList.Clear();
         }
     }
 }
