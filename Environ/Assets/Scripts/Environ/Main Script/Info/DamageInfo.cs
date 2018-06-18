@@ -25,7 +25,7 @@
         [HideInInspector] public bool removeEffect;
 
 
-        public void Setup(Main.EnvironObject targetEO)
+        public void Setup(ResistanceInfo targetR)
         {
             delay.ResetTimer();
             attackGap.timer = 0;
@@ -36,7 +36,7 @@
                 limit.ResetTimer();
 
             if (!dynamicDamage)
-                adjustedDamage = targetEO.resistances != null ? targetEO.resistances.GetAdjustedDamage(damage, ID) : damage;
+                adjustedDamage = targetR != null ? targetR.GetAdjustedDamage(damage, ID) : damage;
         }
 
         public void Refresh()

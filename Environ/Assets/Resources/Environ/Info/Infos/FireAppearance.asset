@@ -13,10 +13,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uniqueID: 0
   debugMode: 0
-  objectParticle: {fileID: 198188649618466196, guid: ce44be986bd8d494c818ec18af599669,
-    type: 2}
-  objectMaterial: {fileID: 0}
-  particlesOn: 0
-  materialOn: 0
+  particle: {fileID: 198188649618466196, guid: ce44be986bd8d494c818ec18af599669, type: 2}
+  material: {fileID: 2100000, guid: ac5179b5673606649a19d1e4b57fb6e8, type: 2}
+  priority: 0
+  mRenderer: {fileID: 0}
+  particlesOn: 1
+  materialOn: 1
   hideOnResistance: 1
   hideIDList: 01000000

@@ -40,34 +40,9 @@
             }
         }
 
-        //public bool HasResistanceTo(DType ID)
-        //{
-        //    return resistanceList.Any(r => r.resistanceID == ID);
-        //}
-
-        //public bool HasNullifyResistanceTo(DType ID)
-        //{
-        //    return resistanceList.Any(r => r.resistanceID == ID);
-        //}
-
-        //public List<DType> GetNullifyIDs()
-        //{
-        //    List<ResistanceContainer> rc = resistanceList.FindAll(r => r.resistType == RType.NULLIFY_DAMAGE);
-        //    return rc.Select(r => r.resistanceID).ToList();
-        //}
-
-        public bool ContainsNullifyResistance()
+        public bool HasNullifyIDMatch(List<DType> matchList)
         {
-            return resistanceList.Any(r => r.resistType == RType.NULLIFY_DAMAGE);
-        }
-
-        public bool ContainsResistanceToID(List<DType> matchList)
-        {
-            foreach (ResistanceContainer rc in resistanceList.FindAll(r => r.resistType == RType.NULLIFY_DAMAGE))
-                if (matchList.Contains(rc.resistanceID))
-                    return true;
-
-            return false;
+            return resistanceList.Where(r=> r.resistType == RType.NULLIFY_DAMAGE).Select(r => r.resistanceID).Intersect(matchList).Any();
         }
     }
 }

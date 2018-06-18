@@ -7,6 +7,7 @@
     using Environ.Support.Enum.Damage;
     using System.Collections.Generic;
     using System.Linq;
+    using Support.Enum.Resistance;
 
     [CreateAssetMenu(fileName = "NewOutput.asset", menuName = "Environ/New Output", order = 1)]
     public class EnvironOutput : ScriptableObject
@@ -78,28 +79,17 @@
             if (damageI)
             {
                 damageI = Instantiate(damageI);
-                damageI.Setup(targetEO);
+                damageI.Setup(targetEO.resistances);
             }
 
             if (appearanceI)
             {
+                appearanceI = Instantiate(appearanceI);
+                appearanceI.Setup(targetEO.gameObject);
+
                 if (appearanceI.hideOnResistance && targetEO.resistances)
-                {
-                    if (targetEO.resistances.ContainsResistanceToID(appearanceI.GetDistinctHideIDList()))
-                        Debug.Log("Appearance Not Added: Target contains a resistance to a selected hide ID");
-
-                    else
-                    {
-                        appearanceI = Instantiate(appearanceI);
-                        appearanceI.Setup(targetEO.transform);
-                    }
-                }
-
-                else
-                {
-                    appearanceI = Instantiate(appearanceI);
-                    appearanceI.Setup(targetEO.transform);
-                }
+                    if (targetEO.resistances.HasNullifyIDMatch(appearanceI.hideIDList.Distinct().ToList()))
+                        appearanceI.TurnOff();
             }
 
             //if (destructionI)

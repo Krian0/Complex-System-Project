@@ -8,6 +8,7 @@
 
     public class EnvironObject : MonoBehaviour
     {
+        #region Variables
         public float hitPointLimit;
         public float hitPoints;
 
@@ -17,11 +18,21 @@
 
         public List<EnvironOutput> output;
         public EnvironEffectList effects;
+        #endregion
 
 
+        #region Start and Update
         void Start()
         {
             output.RemoveAll(o => o == null);
+            effects = new EnvironEffectList();
+            if (!appearance)
+                appearance = ScriptableObject.CreateInstance(typeof(AppearanceInfo)) as AppearanceInfo;
+            else
+                appearance = Instantiate(appearance);
+            appearance.Setup(gameObject);
+            appearance.SetupRenderer();
+
 
             for (int i = 0; i < output.Count; i++)
             {
@@ -31,18 +42,17 @@
                     output[i] = EnvironOutput.SetSourceAndUID(Instantiate(output[i]));
             }
 
-            effects = new EnvironEffectList();
-
-            if (hitPoints == 0)
-                hitPoints = hitPointLimit;
+            SetHitpointsToMax(hitPoints == 0);      //Set hitpoints to hitpoint limit if they were not given a non-zero value
         }
 
         private void Update()
         {
-            if (effects == null)
+            appearance.UpdateAppearance();
+
+            if (effects.inputList.Count == 0)
                 return;
 
-            effects.CullInputList();
+            effects.CullInputList(this);
 
             foreach (EnvironOutput e in effects.inputList)
             {
@@ -64,8 +74,10 @@
 
             ConstrainHitpoints();
         }
+        #endregion
 
 
+        #region Damage Functions
         private float GetAdjustedDamage(DamageInfo di)
         {
             //If dynamicDamage, damage = (if resistances exist) resistance adjusted damage, or di.damage. Else, damage = di.adjustedDamage.
@@ -74,12 +86,19 @@
             di.UpdateLimit(damage);
             return damage;
         }
+        #endregion
 
 
         #region Hitpoint Functions
         public void ConstrainHitpoints()
         {
             hitPoints = Mathf.Clamp(hitPoints, 0, hitPointLimit);
+        }
+
+        public void SetHitpointsToMax(bool conditionalValue = true)
+        {
+            if (conditionalValue)
+                hitPoints = hitPointLimit;
         }
         #endregion
 
