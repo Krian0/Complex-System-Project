@@ -1,29 +1,27 @@
 ﻿namespace Environ.Info
 {
     using UnityEngine;
-    using Support.Enum.Damage;
-    using Support.Timer;
+    using Environ.Support.Enum.Damage;
+    using Environ.Support.Timer;
 
-    [CreateAssetMenu(fileName = "NewDamageInfo.asset", menuName = "Environ/Info/New DamageInfo", order = 1)]
+    [CreateAssetMenu(fileName = "NewDamageInfo.asset", menuName = "Environ/Info/New Damage Info", order = 1)]
     public class DamageInfo : EnvironInfoBase
     {
-        [Space(10)]
         public DType ID;
         public float damage;
-        [HideInInspector] public bool dynamicDamage;
-        [HideInInspector] public float adjustedDamage;
+        public bool dynamicDamage;
+        public float adjustedDamage;
 
-        [HideInInspector] public PauseableTimer attackGap = new PauseableTimer();
-        [HideInInspector] public PauseableTimer delay = new PauseableTimer();
-        [HideInInspector] public bool refreshDelay = false;
+        public PauseableTimer attackGap = new PauseableTimer();
+        public PauseableTimer delay = new PauseableTimer();
+        public bool refreshDelay = false;
 
-        [HideInInspector] public DLimit limitType;
-        [HideInInspector] public PauseableTimer limit = new PauseableTimer();
-        [HideInInspector] public bool refreshLimit = false;
-        [HideInInspector] public bool removeOnLimitReached;
+        public DLimit limitType;
+        public PauseableTimer limit = new PauseableTimer();
+        public bool refreshLimit = false;
+        public bool removeOnLimitReached;
 
-        [HideInInspector] public bool removeEffect;
-
+        public bool removeEffect;
 
         public void Setup(ResistanceInfo targetR)
         {
