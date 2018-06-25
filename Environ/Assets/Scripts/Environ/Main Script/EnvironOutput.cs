@@ -1,79 +1,42 @@
 ﻿namespace Environ.Main
 {
-    using UnityEngine;
-    using Info;
-    using Support.Enum.General;
-    using Support.Timer;
-    using Environ.Support.Enum.Damage;
-    using System.Collections.Generic;
     using System.Linq;
-    using Support.Enum.Resistance;
+    using UnityEngine;
+    using Environ.Info;
+    using Environ.Support.Base;
+    using Environ.Support.EffectList;
+    using Environ.Support.Enum.General;
+    using Environ.Support.Enum.Resistance;
+    using Environ.Support.Timer;
 
     [CreateAssetMenu(fileName = "NewOutput.asset", menuName = "Environ/New Output", order = 1)]
-    public class EnvironOutput : ScriptableObject
+    public class EnvironOutput : EnvironBase
     {
-        [Space(10)]
-        [HideInInspector] public TransferCondition transferCondition = TransferCondition.ON_COLLISION_ENTER;
-        [HideInInspector] public bool allowTransmission = false; // set up transmission
-        [HideInInspector] public Similarity similarity = Similarity.STANDARD;
-        [HideInInspector] public bool selectiveCanBeSimilar;
-        [HideInInspector] public DamageInfo damageSimilarity;
-        [HideInInspector] public AppearanceInfo appearanceSimilarity;
-        //[HideInInspector] public DestructionInfo destructionSimilarity;
+        #region Variables
+        public Similarity similarity;
+        public DamageInfo damageSimilarity;
+        public AppearanceInfo appearanceSimilarity;
+        public bool selectiveCanBeSimilar;
+
+        public TransferCondition transferCondition;
+        public TerminalCondition endOnCondition;
+        public PauseableTimer limit;
+        public bool allowTransmission;
+        public bool refreshTimer;
+
+        public EnvironObject firstSource;
+        public EnvironObject lastSource;
+        public EnvironObject target;
+
+        public DamageInfo damageI;
+        public AppearanceInfo appearanceI;
+
+        private static string selectiveDescription = "SELECTIVE - This EnvironObject is the same as any other EnvironObject containing Info with matching IDs";
+        #endregion
 
 
-        [HideInInspector] public TerminalCondition endOnCondition;
-
-        [HideInInspector] public bool refreshTimer = false;
-        //[HideInInspector] public float timeLimit;
-        //[HideInInspector] public float limitTimer;
-        [HideInInspector] public PauseableTimer limit; // replace above with this
-
-        [HideInInspector] public DamageInfo damageI;
-        [HideInInspector] public AppearanceInfo appearanceI;
-        //public DestructionInfo destructionI;
-
-        [HideInInspector] public EnvironObject firstSource;
-        [HideInInspector] public EnvironObject lastSource;
-        [HideInInspector] public EnvironObject target;
-
-        [HideInInspector] public string uniqueID = "0";
-
-
-
-
-        public void SetSourceAndUID(EnvironObject eoSource)
-        {
-            if (damageI)
-                damageI.uniqueID = GetInstanceID().ToString();
-            if (appearanceI)
-                appearanceI.uniqueID = GetInstanceID().ToString();
-
-            if (similarity == Similarity.SELECTIVE)
-                uniqueID = "SELECTIVE - This EnvironObject is the same as any other EnvironObject containing Info with matching IDs";
-            else
-                uniqueID = GetInstanceID().ToString();
-        }
-
-        public static EnvironOutput SetSourceAndUID(EnvironOutput output)
-        {
-            if (output == null)
-                return null;
-
-
-            if (output.damageI)
-                output.damageI.uniqueID = output.GetInstanceID().ToString();
-            if (output.appearanceI)
-                output.appearanceI.uniqueID = output.GetInstanceID().ToString();
-
-            if (output.similarity == Similarity.SELECTIVE)
-                output.uniqueID = "SELECTIVE - This EnvironObject is the same as any other EnvironObject containing Info with matching IDs";
-            else
-                output.uniqueID = output.GetInstanceID().ToString();
-
-            return output;
-        }
-
+        #region Setup and Update
+        ///<summary> Sets Info and variables up for use. </summary>
         public void Setup(EnvironObject targetEO, EnvironObject lastSourceEO)
         {
             if (damageI)
@@ -87,39 +50,67 @@
                 appearanceI = Instantiate(appearanceI);
                 appearanceI.Setup(targetEO.gameObject);
 
-                if (appearanceI.hideOnResistance && targetEO.resistances)
-                    if (targetEO.resistances.HasNullifyIDMatch(appearanceI.hideIDList.Distinct().ToList()))
+                if (appearanceI.hideOnResistance && targetEO.resistances)   //Turns off Appearance particles and materials if hideOnResistance has been set up
+                    if (targetEO.resistances.HasTypeIDMatch(ResistanceType.NULLIFY_DAMAGE, appearanceI.hideIDList.Distinct()))
                         appearanceI.TurnOff();
             }
-
-            //if (destructionI)
-            //    destructionI = Instantiate(destructionI);
 
             limit.ResetTimer();
             lastSource = lastSourceEO;
             target = targetEO;
 
+            if (similarity == Similarity.SELECTIVE)
+                uniqueID = selectiveDescription;
             if (similarity == Similarity.UNIQUE)
                 uniqueID = GetInstanceID().ToString();
         }
 
+        ///<summary> Sets Info and Output IDs. </summary>
+        public void SetID()
+        {
+            if (damageI)
+                damageI.uniqueID = damageI.GetInstanceID().ToString();
+            if (appearanceI)
+                appearanceI.uniqueID = appearanceI.GetInstanceID().ToString();
+
+            uniqueID = GetInstanceID().ToString();
+        }
+
+        ///<summary> Updates Effect limit, checks to see if DamageInfo can attack, updates AppearanceInfo. Flags effect for removal when the conditions for it are met. </summary>
+        public void UpdateOutput(EnvironEffectList effects, ref float hitPoints, ResistanceInfo resistances)
+        {
+            if (endOnCondition == TerminalCondition.TIMER_ZERO)
+            {
+                limit.UpdateTimer();
+                effects.ConditionalFlagForRemoval(limit.belowZero, this);
+            }
+
+            if (damageI)
+            {
+                damageI.Attack(ref hitPoints, resistances);
+                effects.ConditionalFlagForRemoval(damageI.removeEffect, this);
+            }
+
+            if (appearanceI)
+                appearanceI.UpdateInfo();
+        }
+        #endregion
+
+
+        #region
+        ///<summary> Resets any timers marked for refreshing to their maxTime. </summary>
         public void Refresh()
         {
             if (refreshTimer)
                 limit.ResetTimer();
 
-            if (damageI != null)
+            if (damageI)
                 damageI.Refresh();
         }
-
-        public void Update()
-        {
-            if (limit.AboveZero())
-                limit.UpdateTimer();
-        }
+        #endregion
 
 
-#region Operator Overloads
+        #region Operator Overloads
         public static bool operator ==(EnvironOutput a, EnvironOutput b)
         {
             if (ReferenceEquals(a, null) && ReferenceEquals(b, null))
@@ -157,6 +148,6 @@
         {
             return base.GetHashCode();
         }
-#endregion
+        #endregion
     }
 }

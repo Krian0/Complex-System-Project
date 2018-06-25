@@ -23,21 +23,21 @@ public class DamageInfoEditor : Editor
     SerializedProperty removeEffect;
     SerializedProperty debugMode;
 
-    GUIContent IDGUIC = new GUIContent("ID", "The Identifier for the type of damage.");
-    GUIContent damageGUIC = new GUIContent("Damage", "The amount of damage per attack that this Effect will inflict on the Target.");
-    GUIContent dynamicGUIC = new GUIContent("Dynamic Damage", "When Enabled: Damage will be calculated with Target resistance each attack. \nWhen Disabled: Damage will be calculated with Target resistance once upon the Effect being added to the Target.");
+    GUIContent IDGUIC = new GUIContent("ID", "The identifier for the type of damage.");
+    GUIContent damageGUIC = new GUIContent("Damage", "The amount of damage per attack that this Effect will inflict on the target.");
+    GUIContent dynamicGUIC = new GUIContent("Dynamic Damage", "When Enabled: Damage will be calculated with target resistance each attack. \nWhen Disabled: Damage will be calculated with target resistance once upon the Effect being added to the target.");
 
     GUIContent attackGUIC = new GUIContent("Attack Gap", "The time in seconds that should pass between each attack.");
     GUIContent delayGUIC = new GUIContent("Attack Delay", "The time in seconds to delay the initial attack.");
-    GUIContent refreshDelayGUIC = new GUIContent("Refresh Delay", "When Enabled: If the Transfer Condition is met when this Effect exists on the target, the Attack Delay timer will be reset. \nWhen Disabled: No effect.");
+    GUIContent refreshDelayGUIC = new GUIContent("Refresh Delay", "When Enabled: If the transfer condition is met when this Effect exists on the target, the attack delay timer will be reset. \nWhen Disabled: No effect.");
 
-    GUIContent limitGUIC = new GUIContent("Limit Type", "The type of Limit for when the damage should stop.");
-    GUIContent limitNumGUIC = new GUIContent("Limit Number", "Counts down based on Limit choice. Attacks can only be made when the Limit is above 0.");
-    GUIContent refreshlimitGUIC = new GUIContent("Refresh Limit", "When Enabled: If the Transfer Condition is met when this Effect exists on the target, the Limit tracker will be reset. \nWhen Disabled: No effect.");
-    GUIContent removeOnLimitGUIC = new GUIContent("Remove on Limit Reached", "When Enabled: Upon the Limit reaching 0, this Effect will be removed from the Target. \nWhen Disabled: No effect.");
+    GUIContent limitGUIC = new GUIContent("Limit Type", "The type of limit for when the damage should stop.");
+    GUIContent limitNumGUIC = new GUIContent("Limit Number", "Counts down based on limit choice. Attacks can only be made when the limit is above 0.");
+    GUIContent refreshlimitGUIC = new GUIContent("Refresh Limit", "When Enabled: If the transfer condition is met when this Effect exists on the target, the limit tracker will be reset. \nWhen Disabled: No effect.");
+    GUIContent removeOnLimitGUIC = new GUIContent("Remove on Limit Reached", "When Enabled: Upon the limit reaching 0, this Effect will be removed from the target. \nWhen Disabled: No effect.");
 
     GUIContent debugGUIC = new GUIContent("Debug Mode", "Shows hidden variables in the inspector for debugging purposes.");
-    GUIContent adjDamageGUIC = new GUIContent("Adjusted Damage", "The pre-calculated amount of damage, adjusted by Target resistance, per attack that this Effect will inflict on the Target. This is calculated upon an Effect being added to a Target.");
+    GUIContent adjDamageGUIC = new GUIContent("Adjusted Damage", "The pre-calculated amount of damage, adjusted by target resistance, per attack that this Effect will inflict on the target. This is calculated upon an Effect being added to a target.");
     GUIContent gapTimerGUIC = new GUIContent("Attack Gap Timer");
     GUIContent delayTimerGUIC = new GUIContent("Attack Delay Timer");
     GUIContent LimitTrackerGUIC = new GUIContent("Limit Tracker");
@@ -79,9 +79,9 @@ public class DamageInfoEditor : Editor
         EditorGUILayout.Space();
 
         EditorGUILayout.PropertyField(limitType, limitGUIC);
-        if (limitType.enumValueIndex != (int)DLimit.NO_LIMIT)
+        if (limitType.enumValueIndex != (int)DamageLimit.NONE)
         {
-            limitNumGUIC.text = GetLimitName(limitType.enumNames[limitType.enumValueIndex]);
+            SetLimitName(limitType.enumNames[limitType.enumValueIndex]);
             EditorGUILayout.PropertyField(limit.FindPropertyRelative("maxTime"), limitNumGUIC);
             EditorGUILayout.PropertyField(refreshLimit, refreshlimitGUIC);
             EditorGUILayout.PropertyField(removeOnLimitReached, removeOnLimitGUIC);
@@ -107,7 +107,7 @@ public class DamageInfoEditor : Editor
             EditorGUILayout.PropertyField(attackGap.FindPropertyRelative("timer"), gapTimerGUIC);
             EditorGUILayout.PropertyField(delay.FindPropertyRelative("timer"), delayTimerGUIC);
 
-            if (limitType.enumValueIndex != (int)DLimit.NO_LIMIT)
+            if (limitType.enumValueIndex != (int)DamageLimit.NONE)
             {
                 EditorGUILayout.PropertyField(limit.FindPropertyRelative("timer"), LimitTrackerGUIC);
                 EditorGUILayout.PropertyField(removeEffect);
@@ -122,9 +122,10 @@ public class DamageInfoEditor : Editor
         EditorGUI.indentLevel--;
     }
 
-    private string GetLimitName(string s)
+    ///<summary> Sets the label for limitNumGUIC to match the limit type. </summary> 
+    private void SetLimitName(string s)
     {
         s = s.Replace("_LIMIT", "").ToLower();
-        return char.ToUpper(s[0]) + s.Substring(1) + " Limit";
+        limitNumGUIC.text = char.ToUpper(s[0]) + s.Substring(1) + " Limit";
     }
 }

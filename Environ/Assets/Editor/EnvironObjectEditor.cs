@@ -5,27 +5,72 @@ using Environ.Main;
 [CustomEditor(typeof(EnvironObject))]
 public class EnvironObjectEditor : Editor
 {
-    [HideInInspector]
-    public bool debugMode;
+    SerializedProperty hitPointLimit;
+    SerializedProperty hitPoints;
+
+    SerializedProperty resistances;
+    SerializedProperty appearance;
+    SerializedProperty destruction;
+    SerializedProperty tags;
+
+    SerializedProperty output;
+    SerializedProperty effects;
+
+    bool debugMode;
+
+    GUIContent debugGUIC = new GUIContent("Debug Mode", "Shows hidden variables in the inspector for debugging purposes.");
+
+    private void OnEnable()
+    {
+        hitPointLimit = serializedObject.FindProperty("hitPointLimit");
+        hitPoints = serializedObject.FindProperty("hitPoints");
+
+        resistances = serializedObject.FindProperty("resistances");
+        appearance = serializedObject.FindProperty("appearance");
+        destruction = serializedObject.FindProperty("destruction");
+        tags = serializedObject.FindProperty("tags");
+
+        output = serializedObject.FindProperty("output");
+        effects = serializedObject.FindProperty("effects");
+    }
 
     public override void OnInspectorGUI()
     {
-        EnvironObject script = (EnvironObject)target;
-        EditorExtender.DrawCustomInspector(this);
+        serializedObject.Update();
+        EditorGUILayout.Space();
 
+        EditorGUILayout.PropertyField(hitPointLimit);
+        EditorGUILayout.PropertyField(hitPoints);
+        EditorGUILayout.Space();
+
+        EditorGUILayout.PropertyField(resistances);
+        EditorGUILayout.PropertyField(appearance);
+        EditorGUILayout.PropertyField(destruction);
+        EditorGUILayout.Space();
+
+        EditorGUILayout.PropertyField(tags.FindPropertyRelative("objectTags"), true);
+        EditorGUILayout.Space();
+
+        EditorGUILayout.PropertyField(output, true);
+
+        ShowDebug();
+
+        serializedObject.ApplyModifiedProperties();
+    }
+
+    public void ShowDebug()
+    {
         GUILayout.Space(20);
         EditorGUI.indentLevel += 1;
-        debugMode = EditorGUILayout.Toggle(new GUIContent("Debug Mode", "Shows hidden variables in inspector for debugging purposes"), debugMode);
-        GUILayout.Space(20);
+
+        debugMode = EditorGUILayout.Toggle(debugGUIC, debugMode);
         if (debugMode)
         {
-            int i = 0;
-            foreach (EnvironOutput eo in script.output)
-            {
-                i++;
-                EditorGUILayout.LabelField("Output " + i + " Unique ID: " + eo.uniqueID);
-                eo.uniqueID = EditorGUILayout.TextField(eo.uniqueID);
-            }
+            EditorGUILayout.Space();
+
+            EditorGUILayout.PropertyField(effects, true);
+
+            EditorGUILayout.Space();
 
             if (EditorApplication.isPlaying)
                 Repaint();

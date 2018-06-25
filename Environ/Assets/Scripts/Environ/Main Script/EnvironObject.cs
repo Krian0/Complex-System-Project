@@ -1,37 +1,45 @@
 ﻿namespace Environ.Main
 {
-    using UnityEngine;
+    using System.Collections;
     using System.Collections.Generic;
-    using Info;
-    using Support.Enum.General;
-    using Support.EffectList;
+    using UnityEngine;
+    using Environ.Info;
+    using Environ.Support.EffectList;
+    using Environ.Support.Enum.Destruct;
+    using Environ.Support.Enum.General;
+    using Environ.Support.TagList;
 
     public class EnvironObject : MonoBehaviour
     {
         #region Variables
         public float hitPointLimit;
-        public float hitPoints;
+        public float hitPoints = 0;
 
         public ResistanceInfo resistances;
-        public AppearanceInfo appearance; // implement this
-        //public List<DestructionInfo> destroyConditions;
+        public AppearanceInfo appearance;
+        public DestructionInfo destruction;
+        public EnvironTagList tags = new EnvironTagList();
 
         public List<EnvironOutput> output;
-        public EnvironEffectList effects;
+        public EnvironEffectList effects = new EnvironEffectList();
         #endregion
 
 
         #region Start and Update
+        ///<summary> Sets up Outputs, Info and variables for use. </summary>
         void Start()
         {
-            output.RemoveAll(o => o == null);
-            effects = new EnvironEffectList();
-            if (!appearance)
-                appearance = ScriptableObject.CreateInstance(typeof(AppearanceInfo)) as AppearanceInfo;
-            else
-                appearance = Instantiate(appearance);
+            output.RemoveAll(eOut => !eOut);
+
+            appearance = (appearance) ? Instantiate(appearance) : ScriptableObject.CreateInstance(typeof(AppearanceInfo)) as AppearanceInfo;
             appearance.Setup(gameObject);
             appearance.SetupRenderer();
+
+            if (destruction)
+            {
+                destruction = Instantiate(destruction);
+                destruction.Setup(gameObject);
+            }
 
 
             for (int i = 0; i < output.Count; i++)
@@ -39,62 +47,56 @@
                 output[i].firstSource = this;
 
                 if (output[i].similarity == Similarity.UNIQUE)
-                    output[i] = EnvironOutput.SetSourceAndUID(Instantiate(output[i]));
+                {
+                    output[i] = Instantiate(output[i]);
+                    output[i].SetID();
+                }
             }
 
             SetHitpointsToMax(hitPoints == 0);      //Set hitpoints to hitpoint limit if they were not given a non-zero value
         }
 
+        ///<summary> Updates Appearance and Destruction, removes effects flagged for removal, updates each Effect, contstrains hitPoints. </summary>
         private void Update()
         {
-            appearance.UpdateAppearance();
-
-            if (effects.inputList.Count == 0)
-                return;
-
+            appearance.UpdateInfo();
+            if (destruction)
+            {
+                destruction.UpdateInfo(hitPoints);
+                if (destruction.destroy)
+                    StartCoroutine(DestroyThis(0.4f));
+            }
+          
             effects.CullInputList(this);
 
-            foreach (EnvironOutput e in effects.inputList)
-            {
-                if (e.endOnCondition == TerminalCondition.ON_TIMER)
-                {
-                    e.limit.UpdateTimer();
-                    effects.ConditionalFlagForRemoval(!e.limit.AboveZero(), e);
-                }
-
-                if (e.damageI != null && e.damageI.CanAttack())
-                {
-                    hitPoints -= GetAdjustedDamage(e.damageI);
-                    effects.ConditionalFlagForRemoval(e.damageI.removeEffect, e);
-                }
-
-                if (e.appearanceI != null)
-                    e.appearanceI.UpdateAppearance();
-            }
+            foreach (EnvironOutput eOut in effects.inputList)
+                eOut.UpdateOutput(effects, ref hitPoints, resistances);
 
             ConstrainHitpoints();
         }
         #endregion
 
 
-        #region Damage Functions
-        private float GetAdjustedDamage(DamageInfo di)
+        #region Helpers
+        ///<summary> Stops all Effect particles, waits the given waitTime, then Spawns the onDestruction object and destroys this. </summary>
+        IEnumerator DestroyThis(float waitTime = 3f)
         {
-            //If dynamicDamage, damage = (if resistances exist) resistance adjusted damage, or di.damage. Else, damage = di.adjustedDamage.
-            float damage = di.dynamicDamage ? (resistances != null ? resistances.GetAdjustedDamage(di.damage, di.ID) : di.damage) : di.adjustedDamage;
-
-            di.UpdateLimit(damage);
-            return damage;
+            effects.StopAllParticles(waitTime);
+            yield return new WaitForSeconds(waitTime);
+            destruction.Spawn();
+            Destroy(gameObject);
         }
         #endregion
 
 
         #region Hitpoint Functions
+        ///<summary> Clamps hitPoints between 0 and hitPointLimit. </summary>
         public void ConstrainHitpoints()
         {
             hitPoints = Mathf.Clamp(hitPoints, 0, hitPointLimit);
         }
 
+        ///<summary> Sets hitPoints to hitPointLimit if given Boolean is true. </summary>
         public void SetHitpointsToMax(bool conditionalValue = true)
         {
             if (conditionalValue)
@@ -104,68 +106,107 @@
 
 
         #region OnTrigger & OnCollision Functions
-        private void OnEnterOrStay(TransferCondition transferCondition, EnvironObject targetEO)
+        ///<summary> Adds On_Enter Outputs as an Effect to the TargetEO, as well as Effects with allowTransmission. </summary>
+        private void OnEnter(TransferCondition enterTC, DestroyCondition enterDSC, EnvironObject targetEO)
         {
-            if (targetEO == null || targetEO.effects == null)
+            if (targetEO == null)
                 return;
 
             foreach (EnvironOutput effect in output)
-                if (effect.transferCondition == transferCondition)
-                    targetEO.effects.Add(effect, targetEO, this);
+                if (effect.transferCondition == enterTC)
+                    CheckAndAdd(effect, targetEO, enterDSC);
 
             foreach (EnvironOutput tEffect in effects.inputList)
-                if (tEffect.allowTransmission && tEffect.transferCondition == transferCondition)
-                    targetEO.effects.Add(tEffect, targetEO, this);
+                if (tEffect.allowTransmission && tEffect.transferCondition == enterTC)
+                    CheckAndAdd(tEffect, targetEO, enterDSC);
         }
 
-        private void OnExit(TransferCondition exit, TerminalCondition terminalCondition, EnvironObject targetEO)
+        ///<summary> Adds On_Stay Outputs as an Effect to the TargetEO, as well as Effects with allowTransmission. </summary>
+        private void OnStay(TransferCondition stay, EnvironObject targetEO)
         {
-            if (targetEO == null || targetEO.effects == null)
+            if (targetEO == null)
                 return;
 
-            foreach (EnvironOutput tEffect in effects.inputList)
-                if (tEffect.allowTransmission && tEffect.transferCondition == exit)
-                    targetEO.effects.Add(tEffect, targetEO, this);
-
             foreach (EnvironOutput effect in output)
-            {
-                if (effect.transferCondition == exit)
-                    targetEO.effects.Add(effect, targetEO, this);
+                if (effect.transferCondition == stay)
+                    CheckAndAdd(effect, targetEO);
 
-                if (effect.endOnCondition == terminalCondition)
-                    targetEO.effects.FlagForRemoval(effect);
+            foreach (EnvironOutput tEffect in effects.inputList)
+                if (tEffect.allowTransmission && tEffect.transferCondition == stay)
+                    CheckAndAdd(tEffect, targetEO);
+        }
+
+        ///<summary> Adds On_Exit Outputs as an Effect to the TargetEO, as well as Effects with allowTransmission. Also flags Effects meeting the On_Exit TerminalCondition for removal. </summary>
+        private void OnExit(TransferCondition exitTC, TerminalCondition terminalCondition, DestroyCondition exitDSC, EnvironObject targetEO)
+        {
+            if (targetEO == null)
+                return;
+
+            foreach (EnvironOutput effect in effects.inputList)
+                if (effect.allowTransmission && effect.transferCondition == exitTC)
+                    CheckAndAdd(effect, targetEO, exitDSC);
+
+            foreach (EnvironOutput eOut in output)
+            {
+                if (eOut.transferCondition == exitTC)
+                    CheckAndAdd(eOut, targetEO, exitDSC);
+
+                if (eOut.endOnCondition == terminalCondition)
+                    targetEO.effects.FlagForRemoval(eOut);
             }
         }
 
-
-        private void OnTriggerEnter(Collider other)
+        ///<summary> Checks targetEO DestructionInfo on matching DestroyConditions, adds effect to targetEO's Effects list. </summary>
+        private void CheckAndAdd(EnvironOutput effect, EnvironObject targetEO, DestroyCondition destructCondition)
         {
-            OnEnterOrStay(TransferCondition.ON_TRIGGER_ENTER, other.GetComponent<EnvironObject>());
+            if (targetEO.destruction)
+            {
+                targetEO.destruction.CheckTagsMatch(tags, destructCondition);
+                if (effect.damageI)
+                    targetEO.destruction.CheckDamageMatch(effect.damageI.ID);
+            }
+
+            targetEO.effects.Add(effect, targetEO, this);
         }
 
-        private void OnTriggerStay(Collider other)
+        ///<summary> Checks targetEO DestructionInfo on matching DestroyConditions, adds effect to targetEO's Effects list. </summary>
+        private void CheckAndAdd(EnvironOutput effect, EnvironObject targetEO)
         {
-            OnEnterOrStay(TransferCondition.ON_TRIGGER_STAY, other.GetComponent<EnvironObject>());
+            if (targetEO.destruction && effect.damageI)
+                targetEO.destruction.CheckDamageMatch(effect.damageI.ID);
+
+            targetEO.effects.Add(effect, targetEO, this);
         }
 
-        private void OnTriggerExit(Collider other)
-        {
-            OnExit(TransferCondition.ON_TRIGGER_EXIT, TerminalCondition.ON_TRIGGER_EXIT, other.gameObject.GetComponent<EnvironObject>());
-        }
 
         private void OnCollisionEnter(Collision collision)
         {
-            OnEnterOrStay(TransferCondition.ON_COLLISION_ENTER, collision.gameObject.GetComponent<EnvironObject>());
+            OnEnter(TransferCondition.COLLISION_ENTER, DestroyCondition.COLLISION_ENTER, collision.gameObject.GetComponent<EnvironObject>());
         }
 
         private void OnCollisionStay(Collision collision)
         {
-            OnEnterOrStay(TransferCondition.ON_COLLISION_STAY, collision.gameObject.GetComponent<EnvironObject>());
+            OnStay(TransferCondition.COLLISION_STAY, collision.gameObject.GetComponent<EnvironObject>());
         }
 
         private void OnCollisionExit(Collision collision)
         {
-            OnExit(TransferCondition.ON_COLLISION_EXIT, TerminalCondition.ON_COLLISION_EXIT, collision.gameObject.GetComponent<EnvironObject>());
+            OnExit(TransferCondition.COLLISION_EXIT, TerminalCondition.COLLISION_EXIT, DestroyCondition.COLLISION_EXIT, collision.gameObject.GetComponent<EnvironObject>());
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            OnEnter(TransferCondition.TRIGGER_ENTER, DestroyCondition.TRIGGER_ENTER, other.GetComponent<EnvironObject>());
+        }
+
+        private void OnTriggerStay(Collider other)
+        {
+            OnStay(TransferCondition.TRIGGER_STAY, other.GetComponent<EnvironObject>());
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            OnExit(TransferCondition.TRIGGER_EXIT, TerminalCondition.TRIGGER_EXIT, DestroyCondition.TRIGGER_EXIT, other.GetComponent<EnvironObject>());
         }
         #endregion
     }

@@ -2,7 +2,6 @@
 using UnityEditor;
 using Environ.Main;
 using Environ.Support.Enum.General;
-using Environ.Info;
 
 [CustomEditor(typeof(EnvironOutput))]
 public class EnvironOutputEditor : Editor
@@ -21,7 +20,6 @@ public class EnvironOutputEditor : Editor
     SerializedProperty allowTransmission;
     SerializedProperty endOnCondition;
     SerializedProperty limit;
-
     SerializedProperty refreshTimer;
 
 
@@ -89,7 +87,7 @@ public class EnvironOutputEditor : Editor
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
-        EditorExtender.DrawCustomInspector(this);
+        EditorGUILayout.Space();
 
 
         EditorGUILayout.PropertyField(similarity, similarityGUIC);
@@ -110,7 +108,7 @@ public class EnvironOutputEditor : Editor
         EditorGUILayout.PropertyField(allowTransmission, allowGUIC);
 
         EditorGUILayout.PropertyField(endOnCondition, terminalGUIC);
-        if (endOnCondition.enumValueIndex == (int)TerminalCondition.ON_TIMER)
+        if (endOnCondition.enumValueIndex == (int)TerminalCondition.TIMER_ZERO)
         {
             EditorGUILayout.PropertyField(limit.FindPropertyRelative("maxTime"), limitGUIC);
             EditorGUILayout.PropertyField(refreshTimer, refreshGUIC);
@@ -170,7 +168,7 @@ public class EnvironOutputEditor : Editor
                 EditorGUILayout.PropertyField(targetEO, targetGUIC);
             EditorGUILayout.Space();
 
-            if (endOnCondition.enumValueIndex == (int)TerminalCondition.ON_TIMER)
+            if (endOnCondition.enumValueIndex == (int)TerminalCondition.TIMER_ZERO)
                 EditorGUILayout.PropertyField(limit.FindPropertyRelative("timer"), limitTimer);
             GUILayout.Space(20);
 
