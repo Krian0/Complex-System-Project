@@ -1,6 +1,4 @@
 ﻿using Environ.Main;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SeeScript : MonoBehaviour
@@ -23,19 +21,18 @@ public class SeeScript : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.P) && EUI)
         {
-            EnvironObject eo = rayHit.collider.gameObject.GetComponent<EnvironObject>();
+            EUI.eObject = rayHit.collider.gameObject.GetComponent<EnvironObject>();
 
-            if (rayHit.distance <= 15 && eo)
+            if (rayHit.distance <= 15 && EUI.eObject)
             {
-                if (eo.effects.inputList.Count > 0)
-                    EUI.output = eo.effects.inputList[0];
+                if (EUI.eObject.effects.inputList.Count > 0)
+                    EUI.eOut = EUI.eObject.effects.inputList[0];
                 else
-                    EUI.output = null;
-
-                EUI.UpdateData();
+                    EUI.eOut = null;
             }
         }
 
+        EUI.UpdateData();
         Debug.DrawRay(ray.origin, ray.direction * 50, Color.red);
     }
 

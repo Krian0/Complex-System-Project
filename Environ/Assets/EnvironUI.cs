@@ -6,10 +6,18 @@ using UnityEngine.UI;
 
 public class EnvironUI : MonoBehaviour
 {
-    public EnvironOutput output;
+    public EnvironObject eObject;
+    public EnvironOutput eOut;
+
+    public Text currentHealth;
+    public Text maxHealth;
+
+    public Text outputName;
     public Text fSourceEO;
     public Text lSourceEO;
     public Text targetEO;
+
+    private static string nullString = "N/A";
 
     private void Start()
     {
@@ -19,18 +27,36 @@ public class EnvironUI : MonoBehaviour
 
     public void UpdateData()
     {
-        if (output)
+        if (eObject)
         {
-            fSourceEO.text = (output.firstSource) ? output.firstSource.name : "None";
-            lSourceEO.text = (output.lastSource) ? output.lastSource.name : "None";
-            targetEO.text = (output.target) ? output.target.name : "None";
+            currentHealth.text = eObject.hitPoints.ToString();
+            maxHealth.text = eObject.hitPointLimit.ToString();
+
+            if (eOut)
+            {
+                outputName.text = eOut.name;
+                fSourceEO.text = (eOut.firstSource) ? eOut.firstSource.name : nullString;
+                lSourceEO.text = (eOut.lastSource) ? eOut.lastSource.name : nullString;
+                targetEO.text = (eOut.target) ? eOut.target.name : nullString;
+            }
+
+            else
+            {
+                outputName.text = nullString;
+                fSourceEO.text = nullString;
+                lSourceEO.text = nullString;
+                targetEO.text = nullString;
+            }
         }
 
         else
         {
-            fSourceEO.text = "None";
-            lSourceEO.text = "None";
-            targetEO.text = "None";
+            currentHealth.text = nullString;
+            maxHealth.text = nullString;
+            outputName.text = nullString;
+            fSourceEO.text = nullString;
+            lSourceEO.text = nullString;
+            targetEO.text = nullString;
         }
     }
 }
