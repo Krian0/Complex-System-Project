@@ -8,6 +8,20 @@ public class PostProcess : MonoBehaviour {
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
-        Graphics.Blit(source, destination, mat);
+        if (mat)
+            Graphics.Blit(source, destination, mat);
+        else
+            Graphics.Blit(source, destination);
+    }
+
+
+    public void ClearMaterial()
+    {
+        mat = null;
+    }
+
+    public void SetMaterial(Material material)
+    {
+        mat = material;   
     }
 }

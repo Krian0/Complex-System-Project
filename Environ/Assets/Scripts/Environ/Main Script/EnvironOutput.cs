@@ -62,7 +62,10 @@
             if (similarity == Similarity.SELECTIVE)
                 uniqueID = selectiveDescription;
             if (similarity == Similarity.UNIQUE)
+            {
                 uniqueID = GetInstanceID().ToString();
+                firstSource = lastSourceEO;
+            }
         }
 
         ///<summary> Sets Info and Output IDs. </summary>

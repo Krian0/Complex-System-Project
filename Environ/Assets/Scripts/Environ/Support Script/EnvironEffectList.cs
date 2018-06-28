@@ -30,8 +30,9 @@
             EnvironOutput newEffect = UnityEngine.Object.Instantiate(effect);
             newEffect.Setup(targetEO, lastSourceEO);
 
-            if (inputList.Count == 0 || IsPriority(newEffect.appearanceI))      //If the given Effect has a valid material Appearance that takes priority
-                newEffect.appearanceI.SetRendererMaterial();                    //The material will be added to the Effect's set AppearanceI MeshRenderer.
+            if (newEffect.appearanceI)
+                if (inputList.Count == 0 || IsPriority(newEffect.appearanceI))      //If the given Effect has a valid material Appearance that takes priority
+                    newEffect.appearanceI.SetRendererMaterial();                    //The material will be added to the Effect's set AppearanceI MeshRenderer.
 
             inputList.Add(newEffect);
         }
@@ -82,10 +83,10 @@
         {
             if (inputList.Count > 0)
             {
-                AppearanceInfo apInfo = inputList.Find(eOut => eOut.appearanceI && eOut.appearanceI.canUseMaterial).appearanceI;
+                EnvironOutput output = inputList.Find(eOut => eOut.appearanceI && eOut.appearanceI.canUseMaterial);
 
-                if (apInfo)                                         //Sets the meshRenderer material of targetEO to:
-                    apInfo.SetRendererMaterial();                   //apInfo material (from Effect in inputList)
+                if (output.appearanceI)                                         //Sets the meshRenderer material of targetEO to:
+                    output.appearanceI.SetRendererMaterial();                   //apInfo material (from Effect in inputList)
                 else
                     targetEO.appearance.SetRendererMaterial();      //TargetEO's appearance material (reset)
             }

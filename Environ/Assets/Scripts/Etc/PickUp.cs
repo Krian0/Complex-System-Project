@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿using Environ.Main;
+using UnityEngine;
 
 public class PickUp : MonoBehaviour
 {
+    public SeeScript seeing;
     public Transform holdPos;
     private GameObject lastSeen;
     private bool holding;
@@ -16,16 +18,17 @@ public class PickUp : MonoBehaviour
 
     void Update ()
     {
-        Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+        if (!seeing)
+            return;
+
+        RaycastHit hit = seeing.GetRayHit();
+        if (hit.collider)
+            if (hit.distance <= 15 && hit.collider.gameObject.tag == "Sphere")
+                lastSeen = hit.collider.gameObject;
+
 
         if (!holding)
         {
-            RaycastHit hit;
-
-            if (Physics.Raycast(ray, out hit))
-                if (hit.distance <= 15 && hit.collider.gameObject.tag == "Sphere")
-                    lastSeen = hit.collider.gameObject;
-
             if ((Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.Mouse0)) && lastSeen)
             {
                 lastSeen.transform.position = holdPos.position;
@@ -34,8 +37,6 @@ public class PickUp : MonoBehaviour
                 holding = true;
                 anim.SetTrigger("Pickup");
             }
-
-            Debug.DrawRay(ray.origin, ray.direction * 50, Color.red);
         }
 
         else

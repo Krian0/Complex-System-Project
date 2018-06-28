@@ -75,6 +75,7 @@ GameObject:
   - component: {fileID: 4616090648233034}
   - component: {fileID: 135277668178679976}
   - component: {fileID: 54105124776002066}
+  - component: {fileID: 114065113287776242}
   m_Layer: 0
   m_Name: Charpile
   m_TagString: Untagged
@@ -150,7 +151,6 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RenderingLayerMask: 4294967295
   m_Materials:
   - {fileID: 2100000, guid: 3f8a38e1de06676409528787ffe79823, type: 2}
   m_StaticBatchInfo:
@@ -185,7 +185,6 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RenderingLayerMask: 4294967295
   m_Materials:
   - {fileID: 2100000, guid: 3f8a38e1de06676409528787ffe79823, type: 2}
   m_StaticBatchInfo:
@@ -220,7 +219,6 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RenderingLayerMask: 4294967295
   m_Materials:
   - {fileID: 2100000, guid: 3f8a38e1de06676409528787ffe79823, type: 2}
   m_StaticBatchInfo:
@@ -278,6 +276,27 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &114065113287776242
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1918427269967860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89134264c2018744aa458c300e822a35, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitPointLimit: 0
+  hitPoints: 0
+  resistances: {fileID: 0}
+  appearance: {fileID: 0}
+  destruction: {fileID: 0}
+  tags:
+    objectTags: 
+  output: []
+  effects:
+    inputList: []
 --- !u!135 &135277668178679976
 SphereCollider:
   m_ObjectHideFlags: 1

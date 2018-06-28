@@ -17,10 +17,10 @@ MonoBehaviour:
   damageSimilarity: {fileID: 0}
   appearanceSimilarity: {fileID: 0}
   selectiveCanBeSimilar: 0
-  transferCondition: 0
-  endOnCondition: 0
+  transferCondition: 3
+  endOnCondition: 3
   limit:
-    maxTime: 0
+    maxTime: 1
     timer: 0
     pause: 0
   allowTransmission: 0
